@@ -51,3 +51,7 @@ const setUpGame = () => {
     }
   })
 }
+
+const draw = () => {
+  drawn.push(deck.pop())
+}
