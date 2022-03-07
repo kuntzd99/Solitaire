@@ -1,0 +1,19 @@
+#top-row {
+  display: flex;
+  justify-content: flex-start;
+  border-style: solid;
+}
+
+.main-four {
+  border-style: solid;
+  padding: 50px 30px;
+  margin: 5px 5px;
+}
+
+#drawn,
+#deck {
+  justify-self: flex-end;
+  border-style: solid;
+  padding: 50px 30px;
+  margin: 5px 10px;
+}
