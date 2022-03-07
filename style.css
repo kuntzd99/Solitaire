@@ -1,7 +1,9 @@
-.card-stack {
+.card-stack,
+.card {
   border-style: solid;
-  padding: 50px 30px;
+  padding: 60px 30px;
   margin: 10px 5px;
+  background-color: white;
 }
 
 #top-row {
@@ -27,4 +29,20 @@
 #main-seven {
   display: flex;
   justify-content: space-evenly;
+}
+
+ul {
+  list-style: none;
+}
+
+.main-stack {
+  display: grid;
+}
+
+.facedown {
+  background-color: orange;
+}
+
+#two {
+  grid-template-rows: 40px 1fr;
 }

@@ -1,4 +1,4 @@
-const PEEK_SIZE = '10px'
+const PEEK_SIZE = '40px'
 
 class Card {
   constructor(symbol, suit) {
@@ -16,9 +16,9 @@ class Card {
       this.value = parseInt(symbol)
     }
     if (suit === 'H' || suit === 'D') {
-      this.color = 'r'
+      this.color = 'red'
     } else {
-      this.color = 'b'
+      this.color = 'black'
     }
     this.covered = true
   }
@@ -40,18 +40,71 @@ const mainSeven = [[], [], [], [], [], [], []]
 const mainFour = [[], [], [], []]
 const drawn = []
 
+// Stacks as unordered lists in html
+const deckHTML = document.querySelector('#deck')
+const drawnHTML = document.querySelector('#drawn')
+const mainSevenHTML = document.querySelectorAll('.main-stack')
+
+const showCard = (div, card) => {
+  div.innerText = card.symbol + ' ' + card.suit
+  div.style.color = card.color
+}
+
+const pushCardHTML = (htmlStack, card) => {
+  const newCard = document.createElement('div')
+  newCard.classList.add('card')
+  // if (htmlStack.children.length >= 1) {
+  //   htmlStack.children.style.gridTemplateRows =
+  //     PEEK_SIZE + htmlStack.children.style.gridTemplateRows
+  // }
+  if (card.covered) {
+    newCard.classList.add('facedown')
+  } else {
+    showCard(newCard, card)
+  }
+  htmlStack.appendChild(newCard)
+}
+
 const setUpGame = () => {
-  let cardsDown = 1
   mainSeven.forEach((array, index) => {
     for (let i = 0; i < index + 1; i++) {
-      array.push(deck.pop())
+      let newCard = deck.pop()
+      array.push(newCard)
       if (i === index) {
         array[i].covered = false
       }
+      pushCardHTML(mainSevenHTML[index], newCard)
     }
   })
+  deckHTML.classList.add('facedown')
 }
 
 const draw = () => {
-  drawn.push(deck.pop())
+  if (deck[deck.length - 1]) {
+    newCard = deck.pop()
+    drawn.push(newCard)
+    drawnHTML.classList.add('card')
+    showCard(drawnHTML, newCard)
+  }
 }
+
+deckHTML.addEventListener('click', draw)
+
+setUpGame()
+
+const getAvailableHTMLCards = () => {
+  let cards = []
+  mainSevenHTML.forEach((array) => {
+    for (let i = 0; i < array.children.length; i++) {
+      // This works as long as facedown is always the second class in the classlist
+      if ((array.children[i].classList[1] === 'facedown') === false) {
+        cards.push(array.children[i])
+      }
+    }
+  })
+  return cards
+}
+
+let cardsHTML = getAvailableHTMLCards()
+
+//cardsHTML.forEach((card) => {})
