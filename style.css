@@ -1,3 +1,9 @@
+.card-stack {
+  border-style: solid;
+  padding: 50px 30px;
+  margin: 10px 5px;
+}
+
 #top-row {
   display: flex;
   justify-content: flex-start;
@@ -5,15 +11,20 @@
 }
 
 .main-four {
-  border-style: solid;
-  padding: 50px 30px;
   margin: 5px 5px;
 }
 
 #drawn,
 #deck {
-  justify-self: flex-end;
-  border-style: solid;
-  padding: 50px 30px;
   margin: 5px 10px;
+}
+
+#deck-draw {
+  display: flex;
+  justify-self: flex-end;
+}
+
+#main-seven {
+  display: flex;
+  justify-content: space-evenly;
 }
