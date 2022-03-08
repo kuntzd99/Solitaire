@@ -80,13 +80,13 @@ const setUpGame = () => {
       const newCardDiv = document.createElement('div')
       newCardDiv.classList.add('card')
       newCardDiv.classList.add(index.toString())
-      resize(mainSevenHTML[index])
       if (newCard.covered) {
         newCardDiv.classList.add('facedown')
       } else {
         showCard(newCardDiv, newCard)
       }
       mainSevenHTML[index].appendChild(newCardDiv)
+      resize(mainSevenHTML[index])
     }
   })
   deckHTML.classList.add('facedown')
@@ -131,7 +131,11 @@ const getAvailableHTMLCards = () => {
 }
 
 const getStack = (div) => {
-  return div.classList[1]
+  for (let i = 0; i < div.classList.length; i++) {
+    if (!isNaN(parseInt(div.classList[i]))) {
+      return parseInt(div.classList[i])
+    }
+  }
 }
 
 // Move function
@@ -163,7 +167,6 @@ const move = (movableCardsHTML) => {
               newDiv.innerHTML = card.innerHTML
               newDiv.style.color = card.style.color
               newDiv.classList = card.classList
-              console.log(newDiv)
               stack.appendChild(newDiv)
               stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
               resize(stack)
