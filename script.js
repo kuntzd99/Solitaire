@@ -131,6 +131,10 @@ const getAvailableHTMLCards = () => {
 }
 
 const getStack = (div) => {
+  /*
+  Takes in an HTML card and returns the stack index position for both the HTML stacks and the 
+  javascript stacks
+  */
   for (let i = 0; i < div.classList.length; i++) {
     if (!isNaN(parseInt(div.classList[i]))) {
       return parseInt(div.classList[i])
@@ -192,6 +196,7 @@ const move = (movableCardsHTML) => {
                 mainSevenHTML[originalStackIndex].lastChild
               )
               // Shows next card in line of original list
+              console.log(mainSevenHTML[originalStackIndex].children)
               showCard(
                 mainSevenHTML[originalStackIndex].children[
                   mainSevenHTML[originalStackIndex].children.length - 1
