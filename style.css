@@ -37,12 +37,9 @@ ul {
 
 .main-stack {
   display: grid;
+  grid-template-columns: 1fr;
 }
 
 .facedown {
   background-color: orange;
-}
-
-#two {
-  grid-template-rows: 40px 1fr;
 }
