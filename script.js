@@ -142,19 +142,23 @@ const getStack = (div) => {
   }
 }
 
+const getCardMoving = () => {}
+
 // Move function
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
     card.addEventListener('click', () => {
+      if (card.id === 'drawn') {
+        cardMoving = drawn[drawn.length - 1]
+      } else {
+        cardMoving =
+          mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+      }
       mainSevenHTML.forEach((stack) => {
         stack.addEventListener('click', () => {
-          let cardMoving = 0
-          if (card.id === 'drawn') {
-            cardMoving = drawn[drawn.length - 1]
-          } else {
-            cardMoving =
-              mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
-          }
+          //let cardMoving = 0
+          //console.log(cardMoving)
+          console.log(cardMoving)
           if (
             mainSeven[parseInt(stack.id) - 1][
               mainSeven[parseInt(stack.id) - 1].length - 1
@@ -181,6 +185,7 @@ const move = (movableCardsHTML) => {
               mainSeven[parseInt(stack.id) - 1].push(
                 mainSeven[getStack(card)].pop()
               )
+              //console.log(mainSeven[getStack(card)])
               mainSeven[getStack(card)][
                 mainSeven[getStack(card)].length - 1
               ].covered = false
@@ -191,12 +196,13 @@ const move = (movableCardsHTML) => {
               stack.lastChild.classList.remove(originalStackIndex.toString())
               stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
               resize(stack)
+
               // Removes card from the original HTML list
               // mainSevenHTML[originalStackIndex].removeChild(
               //   mainSevenHTML[originalStackIndex].lastChild
               // )
+
               // Shows next card in line of original list
-              console.log(mainSevenHTML[originalStackIndex])
               showCard(
                 mainSevenHTML[originalStackIndex].lastChild,
                 mainSeven[originalStackIndex][
