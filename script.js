@@ -91,6 +91,7 @@ const draw = () => {
     newCard = deck.pop()
     drawn.push(newCard)
     drawnHTML.classList.add('card')
+    drawnHTML.setAttribute('id', 'drawn')
     showCard(drawnHTML, newCard)
   } else {
     deckHTML.classList.remove('facedown')
@@ -161,13 +162,14 @@ const move = (movableCardsHTML) => {
   mainSevenHTML.forEach((stack) => {
     stack.addEventListener('click', () => {
       if (
-        mainSeven[parseInt(stack.id) - 1][
+        (mainSeven[parseInt(stack.id) - 1][
           mainSeven[parseInt(stack.id) - 1].length - 1
         ].color !== cardMoving.color &&
-        mainSeven[parseInt(stack.id) - 1][
-          mainSeven[parseInt(stack.id) - 1].length - 1
-        ].value ===
-          cardMoving.value + 1
+          mainSeven[parseInt(stack.id) - 1][
+            mainSeven[parseInt(stack.id) - 1].length - 1
+          ].value ===
+            cardMoving.value + 1) ||
+        (mainSeven[parseInt(stack.id) - 1] === [] && cardMoving.symbol === 'K')
       ) {
         if (cardHTML.id === 'drawn') {
           mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
