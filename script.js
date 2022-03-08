@@ -29,23 +29,27 @@ const symbols = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K']
 
 const deck = []
 
+// Initialize deck
 suits.forEach((suit) => {
   symbols.forEach((symbol) => {
     deck.push(new Card(symbol, suit))
   })
 })
 
-// Stacks for game
+// Stacks in JS
 const mainSeven = [[], [], [], [], [], [], []]
 const mainFour = [[], [], [], []]
 const drawn = []
 
-// Stacks as unordered lists in html
+// Stacks in HTML
 const deckHTML = document.querySelector('#deck')
 const drawnHTML = document.querySelector('#drawn')
 const mainSevenHTML = document.querySelectorAll('.main-stack')
 
 const showCard = (div, card) => {
+  /*
+  Displays the given card object on the given HTML div element
+  */
   div.innerText = card.symbol + ' ' + card.suit
   div.style.color = card.color
   div.style.backgroundColor = 'white'
@@ -57,16 +61,6 @@ const resize = (htmlStack) => {
       (PEEK_SIZE + ' ').repeat(htmlStack.children.length - 1) + '1fr'
   }
   return htmlStack
-}
-
-const pushCardHTML = (htmlStack, card) => {
-  resize(mainSevenHTML[index])
-  if (card.covered) {
-    newCard.classList.add('facedown')
-  } else {
-    showCard(newCard, card)
-  }
-  htmlStack.appendChild(newCard)
 }
 
 const setUpGame = () => {
@@ -99,7 +93,7 @@ const draw = () => {
     drawnHTML.classList.add('card')
     showCard(drawnHTML, newCard)
   } else {
-    deckHTML.classList.toggle('facedown')
+    deckHTML.classList.remove('facedown')
   }
   move(getAvailableHTMLCards())
 }
@@ -142,83 +136,166 @@ const getStack = (div) => {
   }
 }
 
-const getCardMoving = () => {}
+let cardMoving = 0
+let cardHTML = 0
+let moveTurn = true
 
-// Move function
+const getCardMoving = (card) => {
+  if (card.id === 'drawn') {
+    cardMoving = drawn[drawn.length - 1]
+  } else {
+    cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+  }
+  console.log(cardMoving)
+  cardHTML = card
+}
+
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
-    card.addEventListener('click', () => {
-      if (card.id === 'drawn') {
-        cardMoving = drawn[drawn.length - 1]
-      } else {
-        cardMoving =
-          mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+    card.addEventListener(
+      'click',
+      () => {
+        getCardMoving(card)
+      },
+      false
+    )
+  })
+  mainSevenHTML.forEach((stack) => {
+    stack.addEventListener('click', () => {
+      if (
+        mainSeven[parseInt(stack.id) - 1][
+          mainSeven[parseInt(stack.id) - 1].length - 1
+        ].color !== cardMoving.color &&
+        mainSeven[parseInt(stack.id) - 1][
+          mainSeven[parseInt(stack.id) - 1].length - 1
+        ].value ===
+          cardMoving.value + 1
+      ) {
+        if (cardHTML.id === 'drawn') {
+          mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
+          cardHTML.removeAttribute('id')
+          let newDiv = document.createElement('div')
+          newDiv.innerHTML = cardHTML.innerHTML
+          newDiv.style.color = cardHTML.style.color
+          newDiv.classList = cardHTML.classList
+          stack.appendChild(newDiv)
+          stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+          resize(stack)
+          draw()
+          //showCard(drawnHTML, drawn[drawn.length - 1])
+        } else {
+          // Make changes in js arrays
+          mainSeven[parseInt(stack.id) - 1].push(
+            mainSeven[getStack(cardHTML)].pop()
+          )
+          //console.log(mainSeven[getStack(card)])
+          mainSeven[getStack(cardHTML)][
+            mainSeven[getStack(cardHTML)].length - 1
+          ].covered = false
+          // Define variable that represents index of stack originally clicked
+          let originalStackIndex = getStack(cardHTML)
+          // Make changes in HTML
+          stack.appendChild(mainSevenHTML[originalStackIndex].lastChild)
+          stack.lastChild.classList.remove(originalStackIndex.toString())
+          stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+          resize(stack)
+
+          // Removes card from the original HTML list
+          // mainSevenHTML[originalStackIndex].removeChild(
+          //   mainSevenHTML[originalStackIndex].lastChild
+          // )
+
+          // Shows next card in line of original list
+          showCard(
+            mainSevenHTML[originalStackIndex].lastChild,
+            mainSeven[originalStackIndex][
+              mainSeven[originalStackIndex].length - 1
+            ]
+          )
+          mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
+            'facedown'
+          )
+          resize(mainSevenHTML[originalStackIndex])
+        }
       }
-      mainSevenHTML.forEach((stack) => {
-        stack.addEventListener('click', () => {
-          //let cardMoving = 0
-          //console.log(cardMoving)
-          console.log(cardMoving)
-          if (
-            mainSeven[parseInt(stack.id) - 1][
-              mainSeven[parseInt(stack.id) - 1].length - 1
-            ].color !== cardMoving.color &&
-            mainSeven[parseInt(stack.id) - 1][
-              mainSeven[parseInt(stack.id) - 1].length - 1
-            ].value ===
-              cardMoving.value + 1
-          ) {
-            if (card.id === 'drawn') {
-              mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
-              card.removeAttribute('id')
-              let newDiv = document.createElement('div')
-              newDiv.innerHTML = card.innerHTML
-              newDiv.style.color = card.style.color
-              newDiv.classList = card.classList
-              stack.appendChild(newDiv)
-              stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
-              resize(stack)
-              draw()
-              //showCard(drawnHTML, drawn[drawn.length - 1])
-            } else {
-              // Make changes in js arrays
-              mainSeven[parseInt(stack.id) - 1].push(
-                mainSeven[getStack(card)].pop()
-              )
-              //console.log(mainSeven[getStack(card)])
-              mainSeven[getStack(card)][
-                mainSeven[getStack(card)].length - 1
-              ].covered = false
-              // Define variable that represents index of stack originally clicked
-              let originalStackIndex = getStack(card)
-              // Make changes in HTML
-              stack.appendChild(mainSevenHTML[originalStackIndex].lastChild)
-              stack.lastChild.classList.remove(originalStackIndex.toString())
-              stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
-              resize(stack)
-
-              // Removes card from the original HTML list
-              // mainSevenHTML[originalStackIndex].removeChild(
-              //   mainSevenHTML[originalStackIndex].lastChild
-              // )
-
-              // Shows next card in line of original list
-              showCard(
-                mainSevenHTML[originalStackIndex].lastChild,
-                mainSeven[originalStackIndex][
-                  mainSeven[originalStackIndex].length - 1
-                ]
-              )
-              mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
-                'facedown'
-              )
-              resize(mainSevenHTML[originalStackIndex])
-            }
-          }
-        })
-      })
     })
   })
 }
+
+// Move function
+// const move = (movableCardsHTML) => {
+//   movableCardsHTML.forEach((card) => {
+//     if (move) {
+//       card.addEventListener('click', () => {
+//         if (card.id === 'drawn') {
+//           cardMoving = drawn[drawn.length - 1]
+//         } else {
+//           cardMoving =
+//             mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+//         }
+//         cardHTML = card
+//     })
+//     mainSevenHTML.forEach((stack) => {
+//       stack.addEventListener('click', () => {
+//         if (
+//           mainSeven[parseInt(stack.id) - 1][
+//             mainSeven[parseInt(stack.id) - 1].length - 1
+//           ].color !== cardMoving.color &&
+//           mainSeven[parseInt(stack.id) - 1][
+//             mainSeven[parseInt(stack.id) - 1].length - 1
+//           ].value ===
+//             cardMoving.value + 1
+//         ) {
+//           if (cardHTML.id === 'drawn') {
+//             mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
+//             cardHTML.removeAttribute('id')
+//             let newDiv = document.createElement('div')
+//             newDiv.innerHTML = cardHTML.innerHTML
+//             newDiv.style.color = cardHTML.style.color
+//             newDiv.classList = cardHTML.classList
+//             stack.appendChild(newDiv)
+//             stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+//             resize(stack)
+//             draw()
+//             //showCard(drawnHTML, drawn[drawn.length - 1])
+//           } else {
+//             // Make changes in js arrays
+//             mainSeven[parseInt(stack.id) - 1].push(
+//               mainSeven[getStack(cardHTML)].pop()
+//             )
+//             //console.log(mainSeven[getStack(card)])
+//             mainSeven[getStack(cardHTML)][
+//               mainSeven[getStack(cardHTML)].length - 1
+//             ].covered = false
+//             // Define variable that represents index of stack originally clicked
+//             let originalStackIndex = getStack(cardHTML)
+//             // Make changes in HTML
+//             stack.appendChild(mainSevenHTML[originalStackIndex].lastChild)
+//             stack.lastChild.classList.remove(originalStackIndex.toString())
+//             stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+//             resize(stack)
+
+//             // Removes card from the original HTML list
+//             // mainSevenHTML[originalStackIndex].removeChild(
+//             //   mainSevenHTML[originalStackIndex].lastChild
+//             // )
+
+//             // Shows next card in line of original list
+//             showCard(
+//               mainSevenHTML[originalStackIndex].lastChild,
+//               mainSeven[originalStackIndex][
+//                 mainSeven[originalStackIndex].length - 1
+//               ]
+//             )
+//             mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
+//               'facedown'
+//             )
+//             resize(mainSevenHTML[originalStackIndex])
+//           }
+//         }
+//       })
+//     })
+//   })
+// }
 
 move(getAvailableHTMLCards())
