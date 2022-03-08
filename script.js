@@ -98,6 +98,8 @@ const draw = () => {
     drawn.push(newCard)
     drawnHTML.classList.add('card')
     showCard(drawnHTML, newCard)
+  } else {
+    deckHTML.classList.toggle('facedown')
   }
   move(getAvailableHTMLCards())
 }
@@ -157,10 +159,16 @@ const move = (movableCardsHTML) => {
             if (card.id === 'drawn') {
               mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
               card.removeAttribute('id')
-              stack.appendChild(card)
+              let newDiv = document.createElement('div')
+              newDiv.innerHTML = card.innerHTML
+              newDiv.style.color = card.style.color
+              newDiv.classList = card.classList
+              console.log(newDiv)
+              stack.appendChild(newDiv)
               stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
               resize(stack)
-              showCard(drawnHTML, drawn[drawn.length - 1])
+              draw()
+              //showCard(drawnHTML, drawn[drawn.length - 1])
             } else {
               // Make changes in js arrays
               mainSeven[parseInt(stack.id) - 1].push(
