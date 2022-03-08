@@ -54,7 +54,7 @@ const showCard = (div, card) => {
 const resize = (htmlStack) => {
   if (htmlStack.children.length >= 1) {
     htmlStack.style.gridTemplateRows =
-      (PEEK_SIZE + ' ').repeat(htmlStack.children.length) + '1fr'
+      (PEEK_SIZE + ' ').repeat(htmlStack.children.length - 1) + '1fr'
   }
   return htmlStack
 }
@@ -191,23 +191,21 @@ const move = (movableCardsHTML) => {
               stack.lastChild.classList.remove(originalStackIndex.toString())
               stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
               resize(stack)
-              // Removes card from the original list
-              mainSevenHTML[originalStackIndex].removeChild(
-                mainSevenHTML[originalStackIndex].lastChild
-              )
+              // Removes card from the original HTML list
+              // mainSevenHTML[originalStackIndex].removeChild(
+              //   mainSevenHTML[originalStackIndex].lastChild
+              // )
               // Shows next card in line of original list
-              console.log(mainSevenHTML[originalStackIndex].children)
+              console.log(mainSevenHTML[originalStackIndex])
               showCard(
-                mainSevenHTML[originalStackIndex].children[
-                  mainSevenHTML[originalStackIndex].children.length - 1
-                ],
+                mainSevenHTML[originalStackIndex].lastChild,
                 mainSeven[originalStackIndex][
                   mainSeven[originalStackIndex].length - 1
                 ]
               )
-              mainSevenHTML[originalStackIndex].children[
-                mainSevenHTML[originalStackIndex].children.length - 1
-              ].classList.toggle('facedown')
+              mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
+                'facedown'
+              )
               resize(mainSevenHTML[originalStackIndex])
             }
           }
