@@ -169,6 +169,19 @@ const isMainFour = (stack) => {
   return false
 }
 
+const addCardFromDrawnToMainFour = (stack) => {
+  mainFour[parseInt(stack.id) - 1].push(drawn.pop())
+  let newDiv = document.createElement('div')
+  newDiv.innerHTML = cardHTML.innerHTML
+  newDiv.style.color = cardHTML.style.color
+  newDiv.classList = cardHTML.classList
+  showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving)
+  showCard(drawnHTML, drawn[drawn.length - 1])
+  drawnHTML.setAttribute('id', 'drawn')
+  moveTurn = true
+  move(getAvailableHTMLCards())
+}
+
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
     card.addEventListener('click', () => {
@@ -185,25 +198,10 @@ const move = (movableCardsHTML) => {
           if (stack.hasChildNodes() === false) {
             if (cardMoving.symbol === 'A') {
               if (cardHTML.id === 'drawn') {
-                mainFour[parseInt(stack.id) - 1].push(drawn.pop())
-                let newDiv = document.createElement('div')
-                newDiv.innerHTML = cardHTML.innerHTML
-                newDiv.style.color = cardHTML.style.color
-                newDiv.classList = cardHTML.classLis
-                showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving)
-                showCard(drawnHTML, drawn[drawn.length - 1])
-                drawnHTML.setAttribute('id', 'drawn')
-                moveTurn = true
-                move(getAvailableHTMLCards())
+                addCardFromDrawnToMainFour(stack)
               }
             }
           } else {
-            console.log(cardMoving.value)
-            console.log(
-              mainFour[parseInt(stack.id) - 1][
-                mainFour[parseInt(stack.id) - 1].length - 1
-              ].value
-            )
             if (
               cardMoving.suit ===
                 mainFour[parseInt(stack.id) - 1][
@@ -215,18 +213,8 @@ const move = (movableCardsHTML) => {
                 ].value +
                   1
             ) {
-              console.log('here')
               if (cardHTML.id === 'drawn') {
-                mainFour[parseInt(stack.id) - 1].push(drawn.pop())
-                let newDiv = document.createElement('div')
-                newDiv.innerHTML = cardHTML.innerHTML
-                newDiv.style.color = cardHTML.style.color
-                newDiv.classList = cardHTML.classLis
-                showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving)
-                showCard(drawnHTML, drawn[drawn.length - 1])
-                drawnHTML.setAttribute('id', 'drawn')
-                moveTurn = true
-                move(getAvailableHTMLCards())
+                addCardFromDrawnToMainFour(stack)
               }
             }
           }
