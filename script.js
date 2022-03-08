@@ -122,9 +122,8 @@ const getAvailableHTMLCards = () => {
     }
   })
   if (drawnHTML.innerText != '') {
-    newDiv = document.createElement('div')
-    showCard(newDiv, drawn[drawn.length - 1])
-    cards.push(newDiv)
+    showCard(drawnHTML, drawn[drawn.length - 1])
+    cards.push(drawnHTML)
   }
   return cards
 }
@@ -139,8 +138,13 @@ const move = (movableCardsHTML) => {
     card.addEventListener('click', () => {
       mainSevenHTML.forEach((stack) => {
         stack.addEventListener('click', () => {
-          let cardMoving =
-            mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+          let cardMoving = 0
+          if (card.id === 'drawn') {
+            cardMoving = drawn[drawn.length - 1]
+          } else {
+            cardMoving =
+              mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+          }
           if (
             mainSeven[parseInt(stack.id) - 1][
               mainSeven[parseInt(stack.id) - 1].length - 1
@@ -150,37 +154,46 @@ const move = (movableCardsHTML) => {
             ].value ===
               cardMoving.value + 1
           ) {
-            // Make changes in js arrays
-            mainSeven[parseInt(stack.id) - 1].push(
-              mainSeven[getStack(card)].pop()
-            )
-            mainSeven[getStack(card)][
-              mainSeven[getStack(card)].length - 1
-            ].covered = false
-            console.log(
-              mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
-            )
-            // Define variable that represents index of stack originally clicked
-            let originalStackIndex = getStack(card)
-            // Make changes in HTML
-            stack.appendChild(mainSevenHTML[originalStackIndex].lastChild)
-            stack.lastChild.classList.remove(originalStackIndex.toString())
-            stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
-            resize(stack)
-            // Removes card from the original list
-            mainSevenHTML[originalStackIndex].removeChild(
-              mainSevenHTML[originalStackIndex].lastChild
-            )
-            // Shows next card in line of original list
-            showCard(
+            if (card.id === 'drawn') {
+              mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
+              card.removeAttribute('id')
+              stack.appendChild(card)
+              stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+              resize(stack)
+              showCard(drawnHTML, drawn[drawn.length - 1])
+            } else {
+              // Make changes in js arrays
+              mainSeven[parseInt(stack.id) - 1].push(
+                mainSeven[getStack(card)].pop()
+              )
+              mainSeven[getStack(card)][
+                mainSeven[getStack(card)].length - 1
+              ].covered = false
+              // Define variable that represents index of stack originally clicked
+              let originalStackIndex = getStack(card)
+              // Make changes in HTML
+              stack.appendChild(mainSevenHTML[originalStackIndex].lastChild)
+              stack.lastChild.classList.remove(originalStackIndex.toString())
+              stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+              resize(stack)
+              // Removes card from the original list
+              mainSevenHTML[originalStackIndex].removeChild(
+                mainSevenHTML[originalStackIndex].lastChild
+              )
+              // Shows next card in line of original list
+              showCard(
+                mainSevenHTML[originalStackIndex].children[
+                  mainSevenHTML[originalStackIndex].children.length - 1
+                ],
+                mainSeven[originalStackIndex][
+                  mainSeven[originalStackIndex].length - 1
+                ]
+              )
               mainSevenHTML[originalStackIndex].children[
                 mainSevenHTML[originalStackIndex].children.length - 1
-              ],
-              mainSeven[originalStackIndex][
-                mainSeven[originalStackIndex].length - 1
-              ]
-            )
-            resize(mainSevenHTML[originalStackIndex])
+              ].classList.toggle('facedown')
+              resize(mainSevenHTML[originalStackIndex])
+            }
           }
         })
       })
