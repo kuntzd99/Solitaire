@@ -99,6 +99,7 @@ const draw = () => {
     drawnHTML.classList.add('card')
     showCard(drawnHTML, newCard)
   }
+  move(getAvailableHTMLCards())
 }
 
 deckHTML.addEventListener('click', draw)
@@ -109,65 +110,82 @@ const getAvailableHTMLCards = () => {
   let cards = []
   mainSevenHTML.forEach((array) => {
     for (let i = 0; i < array.children.length; i++) {
-      // This works as long as facedown is always the second class in the classlist
-      if ((array.children[i].classList[2] === 'facedown') === false) {
+      let available = true
+      for (let j = 0; j < array.children[i].classList.length; j++) {
+        if (array.children[i].classList[j] === 'facedown') {
+          available = false
+        }
+      }
+      if (available) {
         cards.push(array.children[i])
       }
     }
   })
+  if (drawnHTML.innerText != '') {
+    newDiv = document.createElement('div')
+    showCard(newDiv, drawn[drawn.length - 1])
+    cards.push(newDiv)
+  }
   return cards
 }
-
-let movableCardsHTML = getAvailableHTMLCards()
 
 const getStack = (div) => {
   return div.classList[1]
 }
 
-// const updateBoard = () => {
-//   mainSevenHTML.forEach((stack) => {
-
-//   })
-// }
-
 // Move function
-movableCardsHTML.forEach((card) => {
-  card.addEventListener('click', () => {
-    mainSevenHTML.forEach((stack) => {
-      stack.addEventListener('click', () => {
-        let cardMoving =
-          mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
-        if (
-          mainSeven[parseInt(stack.id) - 1][
-            mainSeven[parseInt(stack.id) - 1].length - 1
-          ].color !== cardMoving.color &&
-          mainSeven[parseInt(stack.id) - 1][
-            mainSeven[parseInt(stack.id) - 1].length - 1
-          ].value ===
-            cardMoving.value + 1
-        ) {
-          mainSeven[parseInt(stack.id) - 1].push(
-            mainSeven[getStack(card)].pop()
-          )
-          // mainSeven[getStack(card)][
-          //   mainSeven[getStack(card)].length - 1
-          // ].covered = false
-          stack.appendChild(mainSevenHTML[getStack(card)].lastChild)
-          resize(stack)
-          // Removes card from the original list
-          mainSevenHTML[getStack(card)].removeChild(
-            mainSevenHTML[getStack(card)].lastChild
-          )
-          // Shows next card in line of original list
-          showCard(
-            mainSevenHTML[getStack(card)].children[
-              mainSevenHTML[getStack(card)].children.length - 1
-            ],
+const move = (movableCardsHTML) => {
+  movableCardsHTML.forEach((card) => {
+    card.addEventListener('click', () => {
+      mainSevenHTML.forEach((stack) => {
+        stack.addEventListener('click', () => {
+          let cardMoving =
             mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
-          )
-          resize(mainSevenHTML[getStack(card)])
-        }
+          if (
+            mainSeven[parseInt(stack.id) - 1][
+              mainSeven[parseInt(stack.id) - 1].length - 1
+            ].color !== cardMoving.color &&
+            mainSeven[parseInt(stack.id) - 1][
+              mainSeven[parseInt(stack.id) - 1].length - 1
+            ].value ===
+              cardMoving.value + 1
+          ) {
+            // Make changes in js arrays
+            mainSeven[parseInt(stack.id) - 1].push(
+              mainSeven[getStack(card)].pop()
+            )
+            mainSeven[getStack(card)][
+              mainSeven[getStack(card)].length - 1
+            ].covered = false
+            console.log(
+              mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+            )
+            // Define variable that represents index of stack originally clicked
+            let originalStackIndex = getStack(card)
+            // Make changes in HTML
+            stack.appendChild(mainSevenHTML[originalStackIndex].lastChild)
+            stack.lastChild.classList.remove(originalStackIndex.toString())
+            stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+            resize(stack)
+            // Removes card from the original list
+            mainSevenHTML[originalStackIndex].removeChild(
+              mainSevenHTML[originalStackIndex].lastChild
+            )
+            // Shows next card in line of original list
+            showCard(
+              mainSevenHTML[originalStackIndex].children[
+                mainSevenHTML[originalStackIndex].children.length - 1
+              ],
+              mainSeven[originalStackIndex][
+                mainSeven[originalStackIndex].length - 1
+              ]
+            )
+            resize(mainSevenHTML[originalStackIndex])
+          }
+        })
       })
     })
   })
-})
+}
+
+move(getAvailableHTMLCards())
