@@ -146,19 +146,17 @@ const getCardMoving = (card) => {
   } else {
     cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
-  console.log(cardMoving)
   cardHTML = card
 }
 
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
-    card.addEventListener(
-      'click',
-      () => {
+    card.addEventListener('click', () => {
+      if (moveTurn) {
         getCardMoving(card)
-      },
-      false
-    )
+        moveTurn = false
+      }
+    })
   })
   mainSevenHTML.forEach((stack) => {
     stack.addEventListener('click', () => {
@@ -182,16 +180,19 @@ const move = (movableCardsHTML) => {
           stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
           resize(stack)
           draw()
+          moveTurn = true
+          move(getAvailableHTMLCards())
           //showCard(drawnHTML, drawn[drawn.length - 1])
         } else {
           // Make changes in js arrays
           mainSeven[parseInt(stack.id) - 1].push(
             mainSeven[getStack(cardHTML)].pop()
           )
-          //console.log(mainSeven[getStack(card)])
-          mainSeven[getStack(cardHTML)][
-            mainSeven[getStack(cardHTML)].length - 1
-          ].covered = false
+          if (mainSeven[getStack(cardHTML)].length !== 0) {
+            mainSeven[getStack(cardHTML)][
+              mainSeven[getStack(cardHTML)].length - 1
+            ].covered = false
+          }
           // Define variable that represents index of stack originally clicked
           let originalStackIndex = getStack(cardHTML)
           // Make changes in HTML
@@ -206,16 +207,22 @@ const move = (movableCardsHTML) => {
           // )
 
           // Shows next card in line of original list
-          showCard(
-            mainSevenHTML[originalStackIndex].lastChild,
-            mainSeven[originalStackIndex][
-              mainSeven[originalStackIndex].length - 1
-            ]
-          )
-          mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
-            'facedown'
-          )
-          resize(mainSevenHTML[originalStackIndex])
+          if (mainSeven[originalStackIndex].length !== 0) {
+            showCard(
+              mainSevenHTML[originalStackIndex].lastChild,
+              mainSeven[originalStackIndex][
+                mainSeven[originalStackIndex].length - 1
+              ]
+            )
+            mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
+              'facedown'
+            )
+            resize(mainSevenHTML[originalStackIndex])
+          } else {
+            mainSevenHTML[originalStackIndex].style.borderStyle = 'solid'
+          }
+          moveTurn = true
+          move(getAvailableHTMLCards())
         }
       }
     })
