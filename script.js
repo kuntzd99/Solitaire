@@ -1,4 +1,4 @@
-const PEEK_SIZE = '40px'
+const PEEK_SIZE = '60px'
 
 class Card {
   constructor(symbol, suit) {
@@ -92,7 +92,7 @@ const resetDeck = () => {
   deckHTML.classList.add('facedown')
   drawnHTML.innerText = ''
   drawnHTML.style.color = 'black'
-  deck = drawn
+  deck = drawn.reverse()
   drawn = []
 }
 
@@ -139,6 +139,11 @@ const getAvailableHTMLCards = () => {
     showCard(drawnHTML, drawn[drawn.length - 1])
     cards.push(drawnHTML)
   }
+  for (let i = 0; i < 4; i++) {
+    if (mainFourHTML[i].innerText != '') {
+      cards.push(mainFourHTML[i])
+    }
+  }
   return cards
 }
 
@@ -162,6 +167,10 @@ const getCardMoving = (card) => {
   cardMoving = []
   if (card.id === 'drawn') {
     cardMoving.push(drawn[drawn.length - 1])
+  } else if (isMainFour(stacks[getStack(card)])) {
+    cardMoving.push(
+      mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
+    )
   } else {
     for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
       for (let j = 0; j < card.innerText.length; j++) {
@@ -180,6 +189,7 @@ const getCardMoving = (card) => {
     }
     //cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
+  console.log(cardMoving)
   cardHTML = card
 }
 
@@ -207,6 +217,9 @@ const addCardFromDrawnToMainFour = (stack) => {
   // newDiv.classList = cardHTML.classList
   showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
   showCard(drawnHTML, drawn[drawn.length - 1])
+  mainFourHTML[parseInt(stack.id) - 1].classList.add(
+    (parseInt(stack.id) - 1).toString()
+  )
   drawnHTML.setAttribute('id', 'drawn')
 }
 
@@ -220,9 +233,23 @@ const addCardFromMainSevenToMainFour = (stack) => {
   mainSevenHTML[getStack(cardHTML)].removeChild(
     mainSevenHTML[getStack(cardHTML)].lastChild
   )
+  mainFourHTML[parseInt(stack.id) - 1].classList.add(
+    (parseInt(stack.id) - 1).toString()
+  )
 }
 
-let magicalIndex = 0
+//let magicalIndex = 0
+let switchOrder = false
+
+const checkWin = () => {
+  let total = 0
+  for (let i = 0; i < 4; i++) {
+    total += mainFour[i].length
+  }
+  if (total === 52) {
+    console.log('win')
+  }
+}
 
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
@@ -244,6 +271,7 @@ const move = (movableCardsHTML) => {
             if (cardMoving[0].symbol === 'A') {
               if (cardHTML.id === 'drawn') {
                 addCardFromDrawnToMainFour(stack)
+                checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
               } else {
@@ -257,8 +285,8 @@ const move = (movableCardsHTML) => {
                 mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
                   'facedown'
                 )
+                checkWin()
                 moveTurn = true
-                console.log(getAvailableHTMLCards())
                 move(getAvailableHTMLCards())
               }
             }
@@ -276,11 +304,10 @@ const move = (movableCardsHTML) => {
             ) {
               if (cardHTML.id === 'drawn') {
                 addCardFromDrawnToMainFour(stack)
+                checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
               } else {
-                console.log(stack)
-                console.log(cardHTML)
                 addCardFromMainSevenToMainFour(stack)
                 if (mainSeven[getStack(cardHTML)].length === 0) {
                   mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
@@ -295,6 +322,7 @@ const move = (movableCardsHTML) => {
                     'facedown'
                   )
                 }
+                checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
               }
@@ -318,6 +346,7 @@ const move = (movableCardsHTML) => {
         ) {
           if (mainSeven[parseInt(stack.id) - 1].length === 0) {
             stack.style.borderStyle = 'none'
+            switchOrder = true
           }
           if (cardHTML.id === 'drawn') {
             // Add card from drawn to mainSeven
@@ -336,6 +365,7 @@ const move = (movableCardsHTML) => {
               drawnHTML.innerText = ''
               drawnHTML.color = 'black'
             }
+            drawnHTML.setAttribute('id', 'drawn')
             moveTurn = true
             move(getAvailableHTMLCards())
           } else {
@@ -345,11 +375,12 @@ const move = (movableCardsHTML) => {
                 mainSeven[getStack(cardHTML)].pop()
               )
             }
-            if (mainSeven[getStack(cardHTML)].length !== 0) {
-              mainSeven[getStack(cardHTML)][
-                mainSeven[getStack(cardHTML)].length - 1
-              ].covered = false
-            }
+            // if (mainSeven[getStack(cardHTML)].length !== 0) {
+            //   mainSeven[getStack(cardHTML)][
+            //     mainSeven[getStack(cardHTML)].length - 1
+            //   ].covered = false
+            // }
+
             // Define variable that represents index of stack originally clicked
             let originalStackIndex = getStack(cardHTML)
             // Make changes in HTML
@@ -383,6 +414,8 @@ const move = (movableCardsHTML) => {
 
             // Shows next card in line of original list
             if (mainSeven[originalStackIndex].length !== 0) {
+              //mainSevenHTML[originalStackIndex].children.forEach((card) => {
+              //})
               showCard(
                 mainSevenHTML[originalStackIndex].lastChild,
                 mainSeven[originalStackIndex][
@@ -399,12 +432,20 @@ const move = (movableCardsHTML) => {
             moveTurn = true
             move(getAvailableHTMLCards())
           }
-        } else {
-          // if (magicalIndex % 2 === 1) {
-          //   moveTurn = true
-          // }
-          // magicalIndex++
-        }
+
+          if (switchOrder === true) {
+            if (cardMoving.length > 1) {
+              mainSeven[getStack(cardHTML)] =
+                mainSeven[getStack(cardHTML)].reverse()
+              switchOrder = false
+            }
+          }
+        } //else {
+        //   if (magicalIndex % 2 === 1) {
+        //      moveTurn = true
+        //    }
+        //    magicalIndex++
+        // }
       }
       //}
     })
