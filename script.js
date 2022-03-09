@@ -159,8 +159,10 @@ let cardHTML = 0
 let moveTurn = true
 
 const getCardMoving = (card) => {
+  cardMoving = []
   if (card.id === 'drawn') {
-    cardMoving = drawn[drawn.length - 1]
+    cardMoving.push(drawn[drawn.length - 1])
+    console.log(cardMoving)
   } else {
     for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
       for (let j = 0; j < card.innerText.length; j++) {
@@ -203,11 +205,9 @@ const addCardFromDrawnToMainFour = (stack) => {
   newDiv.innerHTML = cardHTML.innerHTML
   newDiv.style.color = cardHTML.style.color
   newDiv.classList = cardHTML.classList
-  showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving)
+  showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
   showCard(drawnHTML, drawn[drawn.length - 1])
   drawnHTML.setAttribute('id', 'drawn')
-  moveTurn = true
-  move(getAvailableHTMLCards())
 }
 
 const addCardFromMainSevenToMainFour = (stack) => {
@@ -216,12 +216,10 @@ const addCardFromMainSevenToMainFour = (stack) => {
   newDiv.innerHTML = cardHTML.innerHTML
   newDiv.style.color = cardHTML.style.color
   newDiv.classList = cardHTML.classList
-  showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving)
+  showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
   mainSevenHTML[getStack(cardHTML)].removeChild(
     mainSevenHTML[getStack(cardHTML)].lastChild
   )
-  moveTurn = true
-  move(getAvailableHTMLCards())
 }
 
 let magicalIndex = 0
@@ -241,36 +239,45 @@ const move = (movableCardsHTML) => {
       //moveTurn = false
       //if (moveTurn === false) {
       if (isMainFour(stack)) {
-        if (stack.hasChildNodes() === false) {
-          if (cardMoving.symbol === 'A') {
-            if (cardHTML.id === 'drawn') {
-              addCardFromDrawnToMainFour(stack)
-              moveTurn = true
-            } else {
-              addCardFromMainSevenToMainFour(stack)
-              moveTurn = true
+        if (cardMoving.length === 1) {
+          if (stack.hasChildNodes() === false) {
+            if (cardMoving[0].symbol === 'A') {
+              if (cardHTML.id === 'drawn') {
+                addCardFromDrawnToMainFour(stack)
+                moveTurn = true
+                move(getAvailableHTMLCards())
+              } else {
+                addCardFromMainSevenToMainFour(stack)
+                moveTurn = true
+                move(getAvailableHTMLCards())
+              }
+            }
+          } else {
+            if (
+              cardMoving[0].suit ===
+                mainFour[parseInt(stack.id) - 1][
+                  mainFour[parseInt(stack.id) - 1].length - 1
+                ].suit &&
+              cardMoving[0].value ===
+                mainFour[parseInt(stack.id) - 1][
+                  mainFour[parseInt(stack.id) - 1].length - 1
+                ].value +
+                  1
+            ) {
+              if (cardHTML.id === 'drawn') {
+                addCardFromDrawnToMainFour(stack)
+                moveTurn = true
+                move(getAvailableHTMLCards())
+              } else {
+                addCardFromMainSevenToMainFour(stack)
+                moveTurn = true
+                move(getAvailableHTMLCards())
+              }
             }
           }
         } else {
-          if (
-            cardMoving.suit ===
-              mainFour[parseInt(stack.id) - 1][
-                mainFour[parseInt(stack.id) - 1].length - 1
-              ].suit &&
-            cardMoving.value ===
-              mainFour[parseInt(stack.id) - 1][
-                mainFour[parseInt(stack.id) - 1].length - 1
-              ].value +
-                1
-          ) {
-            if (cardHTML.id === 'drawn') {
-              addCardFromDrawnToMainFour(stack)
-              moveTurn = true
-            } else {
-              addCardFromMainSevenToMainFour(stack)
-              moveTurn = true
-            }
-          }
+          moveTurn = true
+          move(getAvailableHTMLCards())
         }
       } else {
         if (
