@@ -1,4 +1,4 @@
-const PEEK_SIZE = '40px'
+const PEEK_SIZE = '60px'
 
 class Card {
   constructor(symbol, suit) {
@@ -177,6 +177,7 @@ const getCardMoving = (card) => {
           }
         }
       }
+      console.log(cardMoving)
     }
     //cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
@@ -222,7 +223,8 @@ const addCardFromMainSevenToMainFour = (stack) => {
   )
 }
 
-let magicalIndex = 0
+//let magicalIndex = 0
+let switchOrder = false
 
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
@@ -258,7 +260,6 @@ const move = (movableCardsHTML) => {
                   'facedown'
                 )
                 moveTurn = true
-                console.log(getAvailableHTMLCards())
                 move(getAvailableHTMLCards())
               }
             }
@@ -279,8 +280,6 @@ const move = (movableCardsHTML) => {
                 moveTurn = true
                 move(getAvailableHTMLCards())
               } else {
-                console.log(stack)
-                console.log(cardHTML)
                 addCardFromMainSevenToMainFour(stack)
                 if (mainSeven[getStack(cardHTML)].length === 0) {
                   mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
@@ -318,6 +317,7 @@ const move = (movableCardsHTML) => {
         ) {
           if (mainSeven[parseInt(stack.id) - 1].length === 0) {
             stack.style.borderStyle = 'none'
+            switchOrder = true
           }
           if (cardHTML.id === 'drawn') {
             // Add card from drawn to mainSeven
@@ -345,11 +345,12 @@ const move = (movableCardsHTML) => {
                 mainSeven[getStack(cardHTML)].pop()
               )
             }
-            if (mainSeven[getStack(cardHTML)].length !== 0) {
-              mainSeven[getStack(cardHTML)][
-                mainSeven[getStack(cardHTML)].length - 1
-              ].covered = false
-            }
+            // if (mainSeven[getStack(cardHTML)].length !== 0) {
+            //   mainSeven[getStack(cardHTML)][
+            //     mainSeven[getStack(cardHTML)].length - 1
+            //   ].covered = false
+            // }
+
             // Define variable that represents index of stack originally clicked
             let originalStackIndex = getStack(cardHTML)
             // Make changes in HTML
@@ -383,6 +384,8 @@ const move = (movableCardsHTML) => {
 
             // Shows next card in line of original list
             if (mainSeven[originalStackIndex].length !== 0) {
+              //mainSevenHTML[originalStackIndex].children.forEach((card) => {
+              //})
               showCard(
                 mainSevenHTML[originalStackIndex].lastChild,
                 mainSeven[originalStackIndex][
@@ -399,12 +402,18 @@ const move = (movableCardsHTML) => {
             moveTurn = true
             move(getAvailableHTMLCards())
           }
-        } else {
-          // if (magicalIndex % 2 === 1) {
-          //   moveTurn = true
-          // }
-          // magicalIndex++
-        }
+
+          if (switchOrder === true) {
+            console.log(getStack(cardHTML))
+            mainSeven[getStack(cardHTML)] =
+              mainSeven[getStack(cardHTML)].reverse()
+          }
+        } //else {
+        //   if (magicalIndex % 2 === 1) {
+        //      moveTurn = true
+        //    }
+        //    magicalIndex++
+        // }
       }
       //}
     })
