@@ -167,6 +167,10 @@ const getCardMoving = (card) => {
   cardMoving = []
   if (card.id === 'drawn') {
     cardMoving.push(drawn[drawn.length - 1])
+  } else if (isMainFour(stacks[getStack(card)])) {
+    cardMoving.push(
+      mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
+    )
   } else {
     for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
       for (let j = 0; j < card.innerText.length; j++) {
@@ -185,6 +189,7 @@ const getCardMoving = (card) => {
     }
     //cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
+  console.log(cardMoving)
   cardHTML = card
 }
 
@@ -212,6 +217,9 @@ const addCardFromDrawnToMainFour = (stack) => {
   // newDiv.classList = cardHTML.classList
   showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
   showCard(drawnHTML, drawn[drawn.length - 1])
+  mainFourHTML[parseInt(stack.id) - 1].classList.add(
+    (parseInt(stack.id) - 1).toString()
+  )
   drawnHTML.setAttribute('id', 'drawn')
 }
 
@@ -224,6 +232,9 @@ const addCardFromMainSevenToMainFour = (stack) => {
   showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
   mainSevenHTML[getStack(cardHTML)].removeChild(
     mainSevenHTML[getStack(cardHTML)].lastChild
+  )
+  mainFourHTML[parseInt(stack.id) - 1].classList.add(
+    (parseInt(stack.id) - 1).toString()
   )
 }
 
