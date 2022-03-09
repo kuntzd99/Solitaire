@@ -280,7 +280,13 @@ const move = (movableCardsHTML) => {
               stack.appendChild(newDiv)
               stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
               resize(stack)
-              draw()
+              if (drawn.length !== 0) {
+                showCard(drawnHTML, drawn[drawn.length - 1])
+              } else {
+                drawnHTML.innerText = ''
+                drawnHTML.color = 'black'
+              }
+              moveTurn = true
             } else {
               // Make changes in js arrays
               mainSeven[parseInt(stack.id) - 1].push(
@@ -323,10 +329,10 @@ const move = (movableCardsHTML) => {
               move(getAvailableHTMLCards())
             }
           } else {
-            if (magicalIndex % 2 === 1) {
-              moveTurn = true
-            }
-            magicalIndex++
+            // if (magicalIndex % 2 === 1) {
+            //   moveTurn = true
+            // }
+            // magicalIndex++
           }
         }
       }
