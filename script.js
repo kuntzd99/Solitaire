@@ -404,9 +404,13 @@ const move = (movableCardsHTML) => {
           }
 
           if (switchOrder === true) {
-            console.log(getStack(cardHTML))
-            mainSeven[getStack(cardHTML)] =
-              mainSeven[getStack(cardHTML)].reverse()
+            if (cardMoving.length > 1) {
+              console.log('here')
+              console.log(getStack(cardHTML))
+              mainSeven[getStack(cardHTML)] =
+                mainSeven[getStack(cardHTML)].reverse()
+              switchOrder = false
+            }
           }
         } //else {
         //   if (magicalIndex % 2 === 1) {
