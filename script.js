@@ -282,16 +282,19 @@ const move = (movableCardsHTML) => {
         }
       } else {
         if (
+          (mainSeven[parseInt(stack.id) - 1].length === 0 &&
+            cardMoving[cardMoving.length - 1].symbol === 'K') ||
           (mainSeven[parseInt(stack.id) - 1][
             mainSeven[parseInt(stack.id) - 1].length - 1
           ].color !== cardMoving[cardMoving.length - 1].color &&
             mainSeven[parseInt(stack.id) - 1][
               mainSeven[parseInt(stack.id) - 1].length - 1
             ].value ===
-              cardMoving[cardMoving.length - 1].value + 1) ||
-          (mainSeven[parseInt(stack.id) - 1] === [] &&
-            cardMoving[cardMoving.length - 1].symbol === 'K')
+              cardMoving[cardMoving.length - 1].value + 1)
         ) {
+          if (mainSeven[parseInt(stack.id) - 1].length === 0) {
+            stack.style.borderStyle = 'none'
+          }
           if (cardHTML.id === 'drawn') {
             // Add card from drawn to mainSeven
             mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
