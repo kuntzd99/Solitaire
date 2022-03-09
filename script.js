@@ -178,7 +178,6 @@ const getCardMoving = (card) => {
         }
       }
     }
-    console.log(cardMoving)
     //cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
   cardHTML = card
@@ -202,10 +201,10 @@ const isMainFour = (stack) => {
 
 const addCardFromDrawnToMainFour = (stack) => {
   mainFour[parseInt(stack.id) - 1].push(drawn.pop())
-  let newDiv = document.createElement('div')
-  newDiv.innerHTML = cardHTML.innerHTML
-  newDiv.style.color = cardHTML.style.color
-  newDiv.classList = cardHTML.classList
+  // let newDiv = document.createElement('div')
+  // newDiv.innerHTML = cardHTML.innerHTML
+  // newDiv.style.color = cardHTML.style.color
+  // newDiv.classList = cardHTML.classList
   showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
   showCard(drawnHTML, drawn[drawn.length - 1])
   drawnHTML.setAttribute('id', 'drawn')
@@ -213,10 +212,10 @@ const addCardFromDrawnToMainFour = (stack) => {
 
 const addCardFromMainSevenToMainFour = (stack) => {
   mainFour[parseInt(stack.id) - 1].push(mainSeven[getStack(cardHTML)].pop())
-  let newDiv = document.createElement('div')
-  newDiv.innerHTML = cardHTML.innerHTML
-  newDiv.style.color = cardHTML.style.color
-  newDiv.classList = cardHTML.classList
+  // let newDiv = document.createElement('div')
+  // newDiv.innerHTML = cardHTML.innerHTML
+  // newDiv.style.color = cardHTML.style.color
+  // newDiv.classList = cardHTML.classList
   showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
   mainSevenHTML[getStack(cardHTML)].removeChild(
     mainSevenHTML[getStack(cardHTML)].lastChild
@@ -249,7 +248,17 @@ const move = (movableCardsHTML) => {
                 move(getAvailableHTMLCards())
               } else {
                 addCardFromMainSevenToMainFour(stack)
+                showCard(
+                  mainSevenHTML[getStack(cardHTML)].lastChild,
+                  mainSeven[getStack(cardHTML)][
+                    mainSeven[getStack(cardHTML)].length - 1
+                  ]
+                )
+                mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
+                  'facedown'
+                )
                 moveTurn = true
+                console.log(getAvailableHTMLCards())
                 move(getAvailableHTMLCards())
               }
             }
@@ -270,7 +279,22 @@ const move = (movableCardsHTML) => {
                 moveTurn = true
                 move(getAvailableHTMLCards())
               } else {
+                console.log(stack)
+                console.log(cardHTML)
                 addCardFromMainSevenToMainFour(stack)
+                if (mainSeven[getStack(cardHTML)].length === 0) {
+                  mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
+                } else {
+                  showCard(
+                    mainSevenHTML[getStack(cardHTML)].lastChild,
+                    mainSeven[getStack(cardHTML)][
+                      mainSeven[getStack(cardHTML)].length - 1
+                    ]
+                  )
+                  mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
+                    'facedown'
+                  )
+                }
                 moveTurn = true
                 move(getAvailableHTMLCards())
               }
@@ -315,7 +339,6 @@ const move = (movableCardsHTML) => {
             moveTurn = true
             move(getAvailableHTMLCards())
           } else {
-            console.log('here')
             // Make changes in js arrays
             for (let i = 0; i < cardMoving.length; i++) {
               mainSeven[parseInt(stack.id) - 1].push(
@@ -331,13 +354,6 @@ const move = (movableCardsHTML) => {
             let originalStackIndex = getStack(cardHTML)
             // Make changes in HTML
             for (let i = 0; i < cardMoving.length; i++) {
-              console.log(
-                mainSevenHTML[originalStackIndex].children[
-                  mainSevenHTML[originalStackIndex].length -
-                    cardMoving.length +
-                    i
-                ]
-              )
               stack.appendChild(
                 mainSevenHTML[originalStackIndex].children[
                   mainSevenHTML[originalStackIndex].children.length -
