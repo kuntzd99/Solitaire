@@ -167,11 +167,12 @@ const getCardMoving = (card) => {
   cardMoving = []
   if (card.id === 'drawn') {
     cardMoving.push(drawn[drawn.length - 1])
-  } else if (isMainFour(stacks[getStack(card)])) {
-    cardMoving.push(
-      mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
-    )
-  } else {
+  } // else if (isMainFour(stacks[getStack(card)])) {
+  //cardMoving.push(
+  //mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
+  //)
+  //}
+  else {
     for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
       for (let j = 0; j < card.innerText.length; j++) {
         if (
@@ -274,7 +275,22 @@ const move = (movableCardsHTML) => {
                 checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
-              } else {
+              } //else if (isMainFour(stacks[getStack(cardHTML)])) {
+              //   showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
+              //   showCard(
+              //     mainFourHTML[getStack(cardHTML)],
+              //     mainFour[getStack(cardHTML)][
+              //       mainFour[getStack(cardHTML)].length - 1
+              //     ]
+              //   )
+              //   mainFourHTML[parseInt(stack.id) - 1].classList.add(
+              //     (parseInt(stack.id) - 1).toString()
+              //   )
+              //   checkWin()
+              //   moveTurn = true
+              //   move(getAvailableHTMLCards())
+              //}
+              else {
                 addCardFromMainSevenToMainFour(stack)
                 showCard(
                   mainSevenHTML[getStack(cardHTML)].lastChild,
