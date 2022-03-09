@@ -225,6 +225,16 @@ const addCardFromMainSevenToMainFour = (stack) => {
 //let magicalIndex = 0
 let switchOrder = false
 
+const checkWin = () => {
+  let total = 0
+  for (let i = 0; i < 4; i++) {
+    total += mainFour[i].length
+  }
+  if ((total = 52)) {
+    console.log('win')
+  }
+}
+
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
     card.addEventListener('click', () => {
@@ -245,6 +255,7 @@ const move = (movableCardsHTML) => {
             if (cardMoving[0].symbol === 'A') {
               if (cardHTML.id === 'drawn') {
                 addCardFromDrawnToMainFour(stack)
+                checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
               } else {
@@ -258,6 +269,7 @@ const move = (movableCardsHTML) => {
                 mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
                   'facedown'
                 )
+                checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
               }
@@ -276,6 +288,7 @@ const move = (movableCardsHTML) => {
             ) {
               if (cardHTML.id === 'drawn') {
                 addCardFromDrawnToMainFour(stack)
+                checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
               } else {
@@ -293,6 +306,7 @@ const move = (movableCardsHTML) => {
                     'facedown'
                   )
                 }
+                checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
               }
