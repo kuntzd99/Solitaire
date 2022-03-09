@@ -154,7 +154,7 @@ const getStack = (div) => {
   }
 }
 
-let cardMoving = 0
+let cardMoving = []
 let cardHTML = 0
 let moveTurn = true
 
@@ -162,7 +162,21 @@ const getCardMoving = (card) => {
   if (card.id === 'drawn') {
     cardMoving = drawn[drawn.length - 1]
   } else {
-    cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
+    for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
+      for (let j = 0; j < card.innerText.length; j++) {
+        if (
+          (mainSeven[getStack(card)][i].symbol === card.innerText[j] ||
+            mainSeven[getStack(card)][i].symbol ===
+              parseInt(card.innerText[j])) &&
+          mainSeven[getStack(card)][i].color === card.style.color
+        ) {
+          for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
+            cardMoving.push(mainSeven[getStack(card)][c])
+          }
+        }
+      }
+    }
+    //cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
   cardHTML = card
 }
@@ -218,7 +232,6 @@ const move = (movableCardsHTML) => {
       if (moveTurn) {
         getCardMoving(card)
         moveTurn = false
-        console.log('false')
       }
     })
   })
@@ -287,7 +300,6 @@ const move = (movableCardsHTML) => {
               drawnHTML.innerText = ''
               drawnHTML.color = 'black'
             }
-            console.log('true')
             moveTurn = true
           } else {
             // Make changes in js arrays
