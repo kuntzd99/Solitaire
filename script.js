@@ -139,6 +139,11 @@ const getAvailableHTMLCards = () => {
     showCard(drawnHTML, drawn[drawn.length - 1])
     cards.push(drawnHTML)
   }
+  for (let i = 0; i < 4; i++) {
+    if (mainFourHTML[i].innerText != '') {
+      cards.push(mainFourHTML[i])
+    }
+  }
   return cards
 }
 
@@ -230,7 +235,7 @@ const checkWin = () => {
   for (let i = 0; i < 4; i++) {
     total += mainFour[i].length
   }
-  if ((total = 52)) {
+  if (total === 52) {
     console.log('win')
   }
 }
