@@ -7,9 +7,13 @@
   max-height: 50px;
 }
 
+div {
+  display: flex;
+}
+
 #top-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   border-style: solid;
 }
 
