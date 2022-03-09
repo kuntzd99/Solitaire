@@ -92,7 +92,7 @@ const resetDeck = () => {
   deckHTML.classList.add('facedown')
   drawnHTML.innerText = ''
   drawnHTML.style.color = 'black'
-  deck = drawn
+  deck = drawn.reverse()
   drawn = []
 }
 
@@ -177,7 +177,6 @@ const getCardMoving = (card) => {
           }
         }
       }
-      console.log(cardMoving)
     }
     //cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
@@ -336,6 +335,7 @@ const move = (movableCardsHTML) => {
               drawnHTML.innerText = ''
               drawnHTML.color = 'black'
             }
+            drawnHTML.setAttribute('id', 'drawn')
             moveTurn = true
             move(getAvailableHTMLCards())
           } else {
@@ -405,8 +405,6 @@ const move = (movableCardsHTML) => {
 
           if (switchOrder === true) {
             if (cardMoving.length > 1) {
-              console.log('here')
-              console.log(getStack(cardHTML))
               mainSeven[getStack(cardHTML)] =
                 mainSeven[getStack(cardHTML)].reverse()
               switchOrder = false
