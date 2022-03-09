@@ -162,7 +162,6 @@ const getCardMoving = (card) => {
   cardMoving = []
   if (card.id === 'drawn') {
     cardMoving.push(drawn[drawn.length - 1])
-    console.log(cardMoving)
   } else {
     for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
       for (let j = 0; j < card.innerText.length; j++) {
@@ -173,11 +172,13 @@ const getCardMoving = (card) => {
           mainSeven[getStack(card)][i].color === card.style.color
         ) {
           for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
+            // The card to compare is at the farthest index
             cardMoving.push(mainSeven[getStack(card)][c])
           }
         }
       }
     }
+    console.log(cardMoving)
     //cardMoving = mainSeven[getStack(card)][mainSeven[getStack(card)].length - 1]
   }
   cardHTML = card
@@ -283,15 +284,16 @@ const move = (movableCardsHTML) => {
         if (
           (mainSeven[parseInt(stack.id) - 1][
             mainSeven[parseInt(stack.id) - 1].length - 1
-          ].color !== cardMoving.color &&
+          ].color !== cardMoving[cardMoving.length - 1].color &&
             mainSeven[parseInt(stack.id) - 1][
               mainSeven[parseInt(stack.id) - 1].length - 1
             ].value ===
-              cardMoving.value + 1) ||
+              cardMoving[cardMoving.length - 1].value + 1) ||
           (mainSeven[parseInt(stack.id) - 1] === [] &&
-            cardMoving.symbol === 'K')
+            cardMoving[cardMoving.length - 1].symbol === 'K')
         ) {
           if (cardHTML.id === 'drawn') {
+            // Add card from drawn to mainSeven
             mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
             cardHTML.removeAttribute('id')
             let newDiv = document.createElement('div')
@@ -308,11 +310,15 @@ const move = (movableCardsHTML) => {
               drawnHTML.color = 'black'
             }
             moveTurn = true
+            move(getAvailableHTMLCards())
           } else {
+            console.log('here')
             // Make changes in js arrays
-            mainSeven[parseInt(stack.id) - 1].push(
-              mainSeven[getStack(cardHTML)].pop()
-            )
+            for (let i = 0; i < cardMoving.length; i++) {
+              mainSeven[parseInt(stack.id) - 1].push(
+                mainSeven[getStack(cardHTML)].pop()
+              )
+            }
             if (mainSeven[getStack(cardHTML)].length !== 0) {
               mainSeven[getStack(cardHTML)][
                 mainSeven[getStack(cardHTML)].length - 1
@@ -321,9 +327,34 @@ const move = (movableCardsHTML) => {
             // Define variable that represents index of stack originally clicked
             let originalStackIndex = getStack(cardHTML)
             // Make changes in HTML
-            stack.appendChild(mainSevenHTML[originalStackIndex].lastChild)
-            stack.lastChild.classList.remove(originalStackIndex.toString())
-            stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+            for (let i = 0; i < cardMoving.length; i++) {
+              console.log(
+                mainSevenHTML[originalStackIndex].children[
+                  mainSevenHTML[originalStackIndex].length -
+                    cardMoving.length +
+                    i
+                ]
+              )
+              stack.appendChild(
+                mainSevenHTML[originalStackIndex].children[
+                  mainSevenHTML[originalStackIndex].children.length -
+                    cardMoving.length +
+                    i
+                ]
+              )
+              stack.lastChild.classList.remove(originalStackIndex.toString())
+              stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+              // stack.children[
+              //   mainSevenHTML[originalStackIndex].children.length -
+              //     cardMoving.length +
+              //     i
+              // ].classList.remove(originalStackIndex.toString())
+              // stack.children[
+              //   mainSevenHTML[originalStackIndex].children.length -
+              //     cardMoving.length +
+              //     i
+              // ].classList.add((parseInt(stack.id) - 1).toString())
+            }
             resize(stack)
 
             // Removes card from the original HTML list
