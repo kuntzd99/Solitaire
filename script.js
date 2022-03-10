@@ -30,11 +30,13 @@ const symbols = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K']
 let deck = []
 
 // Initialize deck
-suits.forEach((suit) => {
-  symbols.forEach((symbol) => {
-    deck.push(new Card(symbol, suit))
+const fillDeck = () => {
+  suits.forEach((suit) => {
+    symbols.forEach((symbol) => {
+      deck.push(new Card(symbol, suit))
+    })
   })
-})
+}
 
 // Stacks in JS
 const mainSeven = [[], [], [], [], [], [], []]
@@ -239,7 +241,6 @@ const createNewDivForMainSeven = (stack) => {
   stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
 }
 
-//let magicalIndex = 0
 let switchOrder = false
 
 const checkWin = () => {
@@ -254,10 +255,238 @@ const checkWin = () => {
 
 let movableCardsHTML = getAvailableHTMLCards()
 
+let counter = 0
+
 const pickCard = (card) => {
-  if (moveTurn) {
-    getCardMoving(card)
-    moveTurn = false
+  console.log('here')
+  //if (moveTurn) {
+  getCardMoving(card)
+  //moveTurn = false
+  //}
+  counter++
+  if (counter > movableCardsHTML.length) {
+    movableCardsHTML.forEach((card) => {
+      card.removeEventListener('click', pickCard)
+    })
+    stacks.forEach((stack) => {
+      stack.addEventListener('click', placeCard(stack))
+    })
+  }
+}
+
+document.querySelector('button').addEventListener('click', () => {
+  fillDeck()
+  setUpGame()
+  movableCardsHTML = getAvailableHTMLCards()
+  counter = 0
+  movableCardsHTML.forEach((card) => {
+    card.addEventListener('click', pickCard(card))
+  })
+})
+
+const placeCard = (stack) => {
+  // Get card to where it is going
+  if (isMainFour(stack)) {
+    if (cardMoving.length === 1) {
+      if (stack.hasChildNodes() === false) {
+        if (cardMoving[0].symbol === 'A') {
+          if (cardHTML.id === 'drawn') {
+            // Moving card from drawn into mainFour
+            addCardFromDrawnToMainFour(stack)
+            checkWin()
+            moveTurn = true
+            //move(getAvailableHTMLCards())
+          } else if (isMainSeven(cardHTML)) {
+            // Moving card from mainSeven into mainFour
+            addCardFromMainSevenToMainFour(stack)
+            showCard(
+              mainSevenHTML[getStack(cardHTML)].lastChild,
+              mainSeven[getStack(cardHTML)][
+                mainSeven[getStack(cardHTML)].length - 1
+              ]
+            )
+            mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
+              'facedown'
+            )
+            checkWin()
+            moveTurn = true
+            //move(getAvailableHTMLCards())
+          } else {
+            // Moving an ace from one mainFour stack to another
+            mainFour[parseInt(stack.id) - 1].push(
+              mainFour[getStack(cardHTML)].pop()
+            )
+            showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
+            mainFourHTML[getStack(cardHTML)].innerText = ''
+            mainFourHTML[getStack(cardHTML)].style.color = 'black'
+            moveTurn = true
+            //move(getAvailableHTMLCards())
+          }
+        }
+      } else {
+        // Moving cards other than an Ace into the mainFour
+        if (
+          cardMoving[0].suit ===
+            mainFour[parseInt(stack.id) - 1][
+              mainFour[parseInt(stack.id) - 1].length - 1
+            ].suit &&
+          cardMoving[0].value ===
+            mainFour[parseInt(stack.id) - 1][
+              mainFour[parseInt(stack.id) - 1].length - 1
+            ].value +
+              1
+        ) {
+          if (cardHTML.id === 'drawn') {
+            // From the drawn pile
+            addCardFromDrawnToMainFour(stack)
+            checkWin()
+            moveTurn = true
+            //move(getAvailableHTMLCards())
+          } else {
+            // From the mainSeven
+            addCardFromMainSevenToMainFour(stack)
+            if (mainSeven[getStack(cardHTML)].length === 0) {
+              mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
+            } else {
+              showCard(
+                mainSevenHTML[getStack(cardHTML)].lastChild,
+                mainSeven[getStack(cardHTML)][
+                  mainSeven[getStack(cardHTML)].length - 1
+                ]
+              )
+              mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
+                'facedown'
+              )
+            }
+            checkWin()
+            moveTurn = true
+            //move(getAvailableHTMLCards())
+          }
+        }
+      }
+    } else {
+      // Error handling
+      moveTurn = true
+      //move(getAvailableHTMLCards())
+    }
+  } else {
+    // Moving cards to the mainSeven
+    if (
+      (mainSeven[parseInt(stack.id) - 1].length === 0 &&
+        cardMoving[cardMoving.length - 1].symbol === 'K') ||
+      (mainSeven[parseInt(stack.id) - 1][
+        mainSeven[parseInt(stack.id) - 1].length - 1
+      ].color !== cardMoving[cardMoving.length - 1].color &&
+        mainSeven[parseInt(stack.id) - 1][
+          mainSeven[parseInt(stack.id) - 1].length - 1
+        ].value ===
+          cardMoving[cardMoving.length - 1].value + 1)
+    ) {
+      if (mainSeven[parseInt(stack.id) - 1].length === 0) {
+        stack.style.borderStyle = 'none'
+        switchOrder = true
+      }
+      if (cardHTML.id === 'drawn') {
+        // Add card from drawn to mainSeven
+        mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
+        cardHTML.removeAttribute('id')
+        createNewDivForMainSeven(stack)
+        resize(stack)
+        if (drawn.length !== 0) {
+          showCard(drawnHTML, drawn[drawn.length - 1])
+        } else {
+          drawnHTML.innerText = ''
+          drawnHTML.color = 'black'
+        }
+        drawnHTML.setAttribute('id', 'drawn')
+        moveTurn = true
+        //move(getAvailableHTMLCards())
+      } else if (isMainSeven(stack)) {
+        //Move cards within the mainSeven stacks
+
+        // Make changes in js arrays
+        for (let i = 0; i < cardMoving.length; i++) {
+          mainSeven[parseInt(stack.id) - 1].push(
+            mainSeven[getStack(cardHTML)].pop()
+          )
+        }
+
+        // Define variable that represents index of stack originally clicked
+        let originalStackIndex = getStack(cardHTML)
+        // Make changes in HTML
+        for (let i = 0; i < cardMoving.length; i++) {
+          stack.appendChild(
+            mainSevenHTML[originalStackIndex].children[
+              mainSevenHTML[originalStackIndex].children.length -
+                cardMoving.length +
+                i
+            ]
+          )
+          stack.lastChild.classList.remove(originalStackIndex.toString())
+          stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
+        }
+        resize(stack)
+
+        // Shows next card in line of original list
+        if (mainSeven[originalStackIndex].length !== 0) {
+          showCard(
+            mainSevenHTML[originalStackIndex].lastChild,
+            mainSeven[originalStackIndex][
+              mainSeven[originalStackIndex].length - 1
+            ]
+          )
+          mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
+            'facedown'
+          )
+          mainSevenHTML[originalStackIndex].lastChild.classList.add(
+            'main-seven'
+          )
+          resize(mainSevenHTML[originalStackIndex])
+        } else {
+          mainSevenHTML[originalStackIndex].style.borderStyle = 'solid'
+        }
+        // Code below fixes a weird bug -- can't really explain why
+        if (switchOrder === true) {
+          if (cardMoving.length > 1) {
+            mainSeven[getStack(cardHTML)] =
+              mainSeven[getStack(cardHTML)].reverse()
+            switchOrder = false
+          }
+        }
+        stacks.forEach((stack) => {
+          stack.removeEventListener('click', placeCard(stack))
+        })
+        movableCardsHTML.forEach((card) => {
+          card.addEventListener('click', pickCard(card))
+        })
+        moveTurn = true
+      } else {
+        // Moving card from mainFour to mainSeven
+        mainSeven[parseInt(stack.id) - 1].push(
+          mainFour[parseInt(cardHTML.id) - 1].pop()
+        )
+        cardHTML.removeAttribute('id')
+        createNewDivForMainSeven(stack)
+        resize(stack)
+        if (mainFourHTML[parseInt(cardHTML.id) - 1].length !== 0) {
+          showCard(
+            mainFourHTML[parseInt(cardHTML.id) - 1],
+            mainFourHTML[parseInt(cardHTML.id) - 1][
+              mainFourHTML[parseInt(cardHTML.id) - 1].length - 1
+            ]
+          )
+        } else {
+          mainFourHTML[parseInt(cardHTML.id) - 1].innerText = ''
+          mainFourHTML[parseInt(cardHTML.id) - 1].color = 'black'
+        }
+        stacks.forEach((stack) => {
+          stack.removeEventListener('click', placeCard(stack))
+        })
+        movableCardsHTML.forEach((card) => {
+          card.addEventListener('click', pickCard(card))
+        })
+      }
+    }
   }
 }
 
@@ -266,207 +495,6 @@ const move = (movableCardsHTML) => {
     card.addEventListener('click', pickCard(card))
   })
   stacks.forEach((stack) => {
-    stack.addEventListener('click', () => {
-      // Get stack where it is going
-      if (isMainFour(stack)) {
-        if (cardMoving.length === 1) {
-          if (stack.hasChildNodes() === false) {
-            if (cardMoving[0].symbol === 'A') {
-              if (cardHTML.id === 'drawn') {
-                // Moving card from drawn into mainFour
-                addCardFromDrawnToMainFour(stack)
-                checkWin()
-                moveTurn = true
-                move(getAvailableHTMLCards())
-              } else if (isMainSeven(cardHTML)) {
-                // Moving card from mainSeven into mainFour
-                addCardFromMainSevenToMainFour(stack)
-                showCard(
-                  mainSevenHTML[getStack(cardHTML)].lastChild,
-                  mainSeven[getStack(cardHTML)][
-                    mainSeven[getStack(cardHTML)].length - 1
-                  ]
-                )
-                mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
-                  'facedown'
-                )
-                checkWin()
-                moveTurn = true
-                move(getAvailableHTMLCards())
-              } else {
-                // Moving an ace from one mainFour stack to another
-                mainFour[parseInt(stack.id) - 1].push(
-                  mainFour[getStack(cardHTML)].pop()
-                )
-                showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
-                mainFourHTML[getStack(cardHTML)].innerText = ''
-                mainFourHTML[getStack(cardHTML)].style.color = 'black'
-                moveTurn = true
-                move(getAvailableHTMLCards())
-              }
-            }
-          } else {
-            // Moving cards other than an Ace into the mainFour
-            if (
-              cardMoving[0].suit ===
-                mainFour[parseInt(stack.id) - 1][
-                  mainFour[parseInt(stack.id) - 1].length - 1
-                ].suit &&
-              cardMoving[0].value ===
-                mainFour[parseInt(stack.id) - 1][
-                  mainFour[parseInt(stack.id) - 1].length - 1
-                ].value +
-                  1
-            ) {
-              if (cardHTML.id === 'drawn') {
-                // From the drawn pile
-                addCardFromDrawnToMainFour(stack)
-                checkWin()
-                moveTurn = true
-                move(getAvailableHTMLCards())
-              } else {
-                // From the mainSeven
-                addCardFromMainSevenToMainFour(stack)
-                if (mainSeven[getStack(cardHTML)].length === 0) {
-                  mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
-                } else {
-                  showCard(
-                    mainSevenHTML[getStack(cardHTML)].lastChild,
-                    mainSeven[getStack(cardHTML)][
-                      mainSeven[getStack(cardHTML)].length - 1
-                    ]
-                  )
-                  mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
-                    'facedown'
-                  )
-                }
-                checkWin()
-                moveTurn = true
-                move(getAvailableHTMLCards())
-              }
-            }
-          }
-        } else {
-          // Error handling
-          moveTurn = true
-          move(getAvailableHTMLCards())
-        }
-      } else {
-        // Moving cards to the mainSeven
-        if (
-          (mainSeven[parseInt(stack.id) - 1].length === 0 &&
-            cardMoving[cardMoving.length - 1].symbol === 'K') ||
-          (mainSeven[parseInt(stack.id) - 1][
-            mainSeven[parseInt(stack.id) - 1].length - 1
-          ].color !== cardMoving[cardMoving.length - 1].color &&
-            mainSeven[parseInt(stack.id) - 1][
-              mainSeven[parseInt(stack.id) - 1].length - 1
-            ].value ===
-              cardMoving[cardMoving.length - 1].value + 1)
-        ) {
-          if (mainSeven[parseInt(stack.id) - 1].length === 0) {
-            stack.style.borderStyle = 'none'
-            switchOrder = true
-          }
-          if (cardHTML.id === 'drawn') {
-            // Add card from drawn to mainSeven
-            mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
-            cardHTML.removeAttribute('id')
-            createNewDivForMainSeven(stack)
-            resize(stack)
-            if (drawn.length !== 0) {
-              showCard(drawnHTML, drawn[drawn.length - 1])
-            } else {
-              drawnHTML.innerText = ''
-              drawnHTML.color = 'black'
-            }
-            drawnHTML.setAttribute('id', 'drawn')
-            moveTurn = true
-            move(getAvailableHTMLCards())
-          } else if (isMainSeven(stack)) {
-            //Move cards within the mainSeven stacks
-
-            // Make changes in js arrays
-            for (let i = 0; i < cardMoving.length; i++) {
-              mainSeven[parseInt(stack.id) - 1].push(
-                mainSeven[getStack(cardHTML)].pop()
-              )
-            }
-
-            // Define variable that represents index of stack originally clicked
-            let originalStackIndex = getStack(cardHTML)
-            // Make changes in HTML
-            for (let i = 0; i < cardMoving.length; i++) {
-              stack.appendChild(
-                mainSevenHTML[originalStackIndex].children[
-                  mainSevenHTML[originalStackIndex].children.length -
-                    cardMoving.length +
-                    i
-                ]
-              )
-              stack.lastChild.classList.remove(originalStackIndex.toString())
-              stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
-            }
-            resize(stack)
-
-            // Shows next card in line of original list
-            if (mainSeven[originalStackIndex].length !== 0) {
-              showCard(
-                mainSevenHTML[originalStackIndex].lastChild,
-                mainSeven[originalStackIndex][
-                  mainSeven[originalStackIndex].length - 1
-                ]
-              )
-              mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
-                'facedown'
-              )
-              mainSevenHTML[originalStackIndex].lastChild.classList.add(
-                'main-seven'
-              )
-              resize(mainSevenHTML[originalStackIndex])
-            } else {
-              mainSevenHTML[originalStackIndex].style.borderStyle = 'solid'
-            }
-            // Code below fixes a weird bug -- can't really explain why
-            if (switchOrder === true) {
-              if (cardMoving.length > 1) {
-                mainSeven[getStack(cardHTML)] =
-                  mainSeven[getStack(cardHTML)].reverse()
-                switchOrder = false
-              }
-            }
-            moveTurn = true
-            move(getAvailableHTMLCards())
-          } else {
-            // Moving card from mainFour to mainSeven
-            mainSeven[parseInt(stack.id) - 1].push(
-              mainFour[parseInt(cardHTML.id) - 1].pop()
-            )
-            cardHTML.removeAttribute('id')
-            createNewDivForMainSeven(stack)
-            resize(stack)
-            if (mainFourHTML[parseInt(cardHTML.id) - 1].length !== 0) {
-              showCard(
-                mainFourHTML[parseInt(cardHTML.id) - 1],
-                mainFourHTML[parseInt(cardHTML.id) - 1][
-                  mainFourHTML[parseInt(cardHTML.id) - 1].length - 1
-                ]
-              )
-            } else {
-              mainFourHTML[parseInt(cardHTML.id) - 1].innerText = ''
-              mainFourHTML[parseInt(cardHTML.id) - 1].color = 'black'
-            }
-            moveTurn = true
-            move(getAvailableHTMLCards())
-          }
-        }
-      }
-    })
+    stack.addEventListener('click', placeCard(stack))
   })
 }
-
-document.querySelector('button').addEventListener('click', () => {
-  // you have to clear all the decks before calling setUpGame
-  setUpGame()
-  move(getAvailableHTMLCards())
-})
