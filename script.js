@@ -95,6 +95,7 @@ const resetDeck = () => {
   deckHTML.classList.add('facedown')
   drawnHTML.innerText = ''
   drawnHTML.style.color = 'black'
+  drawnHTML.style.backgroundColor = ''
   deck = drawn.reverse()
   drawn = []
 }
@@ -109,13 +110,7 @@ const draw = () => {
   } else {
     deckHTML.classList.remove('facedown')
   }
-  movableCardsHTML = getAvailableHTMLCards()
-  stacks.forEach((stack) => {
-    stack.removeEventListener('click', myListenerStack)
-  })
-  movableCardsHTML.forEach((card) => {
-    card.addEventListener('click', myListenerCard)
-  })
+  resetTurn()
 }
 
 const resetTurn = () => {
@@ -217,7 +212,6 @@ const getCardMoving = (card) => {
   }
   mainFourHTML[parseInt(cardHTML.id) - 1]
   cardHTML = card
-  console.log(cardMoving)
 }
 
 const isMainFour = (stack) => {
@@ -362,13 +356,7 @@ const placeCard = (stack) => {
             // Moving card from drawn into mainFour
             addCardFromDrawnToMainFour(stack)
             checkWin()
-            movableCardsHTML = getAvailableHTMLCards()
-            stacks.forEach((stack) => {
-              stack.removeEventListener('click', myListenerStack)
-            })
-            movableCardsHTML.forEach((card) => {
-              card.addEventListener('click', myListenerCard)
-            })
+            resetTurn()
           } else if (isMainSeven(cardHTML)) {
             // Moving card from mainSeven into mainFour
             addCardFromMainSevenToMainFour(stack)
@@ -499,7 +487,7 @@ const placeCard = (stack) => {
         }
         drawnHTML.setAttribute('id', 'drawn')
         resetTurn()
-      } else if (isMainSeven(stack)) {
+      } else if (isMainSeven(cardHTML)) {
         //Move cards within the mainSeven stacks
         // Make changes in js arrays
         for (let i = 0; i < cardMoving.length; i++) {
@@ -562,27 +550,36 @@ const placeCard = (stack) => {
         mainSeven[parseInt(stack.id) - 1].push(
           mainFour[parseInt(cardHTML.id) - 1].pop()
         )
-        cardHTML.removeAttribute('id')
+        cardHTML.classList.remove('main-four')
+        cardHTML.classList.remove(getStack(cardHTML).toString())
+        cardHTML.classList.remove('card-stack')
+        cardHTML.classList.add('card')
+        cardHTML.classList.remove('main')
         createNewDivForMainSeven(stack)
         resize(stack)
         if (mainFourHTML[parseInt(cardHTML.id) - 1].length !== 0) {
           showCard(
             mainFourHTML[parseInt(cardHTML.id) - 1],
-            mainFourHTML[parseInt(cardHTML.id) - 1][
-              mainFourHTML[parseInt(cardHTML.id) - 1].length - 1
+            mainFour[parseInt(cardHTML.id) - 1][
+              mainFour[parseInt(cardHTML.id) - 1].length - 1
             ]
           )
+          console.log(mainFourHTML[parseInt(cardHTML.id) - 1])
+          mainFourHTML[parseInt(cardHTML.id) - 1].setAttribute('id', '1')
+          let index = cardHTML.id.toString()
+          console.log(typeof index)
+          //mainFourHTML[parseInt(cardHTML.id) - 1].id = cardHTML.id.toString()
+          //console.log(mainFourHTML[parseInt(cardHTML.ID) - 1].id)
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main-four')
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('card-stack')
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main')
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.remove('card')
         } else {
           mainFourHTML[parseInt(cardHTML.id) - 1].innerText = ''
           mainFourHTML[parseInt(cardHTML.id) - 1].color = 'black'
         }
-        movableCardsHTML = getAvailableHTMLCards()
-        stacks.forEach((stack) => {
-          stack.removeEventListener('click', myListenerStack)
-        })
-        movableCardsHTML.forEach((card) => {
-          card.addEventListener('click', myListenerCard)
-        })
+        cardHTML.removeAttribute('id')
+        resetTurn()
       }
     }
   }
