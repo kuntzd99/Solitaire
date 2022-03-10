@@ -80,6 +80,7 @@ const setUpGame = () => {
         newCardDiv.classList.add('facedown')
       } else {
         showCard(newCardDiv, newCard)
+        newCardDiv.classList.add('main-seven')
       }
       mainSevenHTML[index].appendChild(newCardDiv)
       resize(mainSevenHTML[index])
@@ -167,7 +168,7 @@ const getCardMoving = (card) => {
   cardMoving = []
   if (card.id === 'drawn') {
     cardMoving.push(drawn[drawn.length - 1])
-  } else if (isMainSeven(mainSevenHTML[getStack(card)])) {
+  } else if (isMainSeven(card)) {
     for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
       for (let j = 0; j < card.innerText.length; j++) {
         if (
@@ -184,7 +185,6 @@ const getCardMoving = (card) => {
       }
     }
   } else {
-    console.log('here')
     cardMoving.push(
       mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
     )
@@ -212,7 +212,7 @@ const isMainFour = (stack) => {
 
 const isMainSeven = (stack) => {
   for (let i = 0; i < stack.classList.length; i++) {
-    if (stack.classList[i] === 'main-stack') {
+    if (stack.classList[i] === 'main-seven') {
       return true
     }
   }
@@ -278,28 +278,14 @@ const move = (movableCardsHTML) => {
       if (isMainFour(stack)) {
         if (cardMoving.length === 1) {
           if (stack.hasChildNodes() === false) {
+            console.log('pass')
             if (cardMoving[0].symbol === 'A') {
               if (cardHTML.id === 'drawn') {
                 addCardFromDrawnToMainFour(stack)
                 checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
-              } else if (isMainFour(stack[parseInt(cardHTML.id) - 1])) {
-                console.log('here')
-                showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
-                showCard(
-                  mainFourHTML[getStack(cardHTML)],
-                  mainFour[getStack(cardHTML)][
-                    mainFour[getStack(cardHTML)].length - 1
-                  ]
-                )
-                mainFourHTML[parseInt(stack.id) - 1].classList.add(
-                  (parseInt(stack.id) - 1).toString()
-                )
-                checkWin()
-                moveTurn = true
-                move(getAvailableHTMLCards())
-              } else {
+              } else if (isMainSeven(cardHTML)) {
                 addCardFromMainSevenToMainFour(stack)
                 showCard(
                   mainSevenHTML[getStack(cardHTML)].lastChild,
@@ -310,6 +296,30 @@ const move = (movableCardsHTML) => {
                 mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
                   'facedown'
                 )
+                checkWin()
+                moveTurn = true
+                move(getAvailableHTMLCards())
+              } else {
+                mainFour[parseInt(stack.id) - 1].push(
+                  mainFour[getStack(cardHTML)].pop()
+                )
+                showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
+                console.log('here')
+                if (mainFour[getStack(cardHTML)].length !== 0) {
+                  // shows next card up
+                  showCard(
+                    mainFourHTML[getStack(cardHTML)],
+                    mainFour[getStack(cardHTML)][
+                      mainFour[getStack(cardHTML)].length - 1
+                    ]
+                  )
+                  mainFourHTML[parseInt(stack.id) - 1].classList.add(
+                    (parseInt(stack.id) - 1).toString()
+                  )
+                } else {
+                  mainFourHTML[getStack(cardHTML)].innerText = ''
+                  mainFourHTML[getStack(cardHTML)].style.color = 'black'
+                }
                 checkWin()
                 moveTurn = true
                 move(getAvailableHTMLCards())
@@ -393,12 +403,7 @@ const move = (movableCardsHTML) => {
             drawnHTML.setAttribute('id', 'drawn')
             moveTurn = true
             move(getAvailableHTMLCards())
-          } else if (isMainFour(stack[parseInt(cardHTML.id) - 1])) {
-            console.log('here')
-            mainSeven[parseInt(stack.id) - 1].push(
-              mainFour[parseInt(cardHTML.id) - 1].pop()
-            )
-          } else {
+          } else if (isMainSeven(stack)) {
             // Make changes in js arrays
             for (let i = 0; i < cardMoving.length; i++) {
               mainSeven[parseInt(stack.id) - 1].push(
@@ -455,12 +460,19 @@ const move = (movableCardsHTML) => {
               mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
                 'facedown'
               )
+              mainSevenHTML[originalStackIndex].lastChild.classList.add(
+                'main-seven'
+              )
               resize(mainSevenHTML[originalStackIndex])
             } else {
               mainSevenHTML[originalStackIndex].style.borderStyle = 'solid'
             }
             moveTurn = true
             move(getAvailableHTMLCards())
+          } else {
+            mainSeven[parseInt(stack.id) - 1].push(
+              mainFour[parseInt(cardHTML.id) - 1].pop()
+            )
           }
 
           if (switchOrder === true) {
