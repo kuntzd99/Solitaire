@@ -426,6 +426,14 @@ const move = (movableCardsHTML) => {
             } else {
               mainSevenHTML[originalStackIndex].style.borderStyle = 'solid'
             }
+            // Code below fixes a weird bug -- can't really explain why
+            if (switchOrder === true) {
+              if (cardMoving.length > 1) {
+                mainSeven[getStack(cardHTML)] =
+                  mainSeven[getStack(cardHTML)].reverse()
+                switchOrder = false
+              }
+            }
             moveTurn = true
             move(getAvailableHTMLCards())
           } else {
@@ -450,14 +458,6 @@ const move = (movableCardsHTML) => {
             moveTurn = true
             move(getAvailableHTMLCards())
           }
-
-          if (switchOrder === true) {
-            if (cardMoving.length > 1) {
-              mainSeven[getStack(cardHTML)] =
-                mainSeven[getStack(cardHTML)].reverse()
-              switchOrder = false
-            }
-          }
         }
       }
     })
@@ -465,3 +465,9 @@ const move = (movableCardsHTML) => {
 }
 
 move(getAvailableHTMLCards())
+
+document.querySelector('button').addEventListener('click', () => {
+  // you have to clear all the decks before calling setUpGame
+  setUpGame()
+  move(getAvailableHTMLCards())
+})
