@@ -119,8 +119,6 @@ deckHTML.addEventListener('click', () => {
   }
 })
 
-setUpGame()
-
 const getAvailableHTMLCards = () => {
   let cards = []
   mainSevenHTML.forEach((array) => {
@@ -254,15 +252,18 @@ const checkWin = () => {
   }
 }
 
+let movableCardsHTML = getAvailableHTMLCards()
+
+const pickCard = (card) => {
+  if (moveTurn) {
+    getCardMoving(card)
+    moveTurn = false
+  }
+}
+
 const move = (movableCardsHTML) => {
   movableCardsHTML.forEach((card) => {
-    card.addEventListener('click', () => {
-      // Get cardMoving and cardHTML
-      if (moveTurn) {
-        getCardMoving(card)
-        moveTurn = false
-      }
-    })
+    card.addEventListener('click', pickCard(card))
   })
   stacks.forEach((stack) => {
     stack.addEventListener('click', () => {
@@ -463,8 +464,6 @@ const move = (movableCardsHTML) => {
     })
   })
 }
-
-move(getAvailableHTMLCards())
 
 document.querySelector('button').addEventListener('click', () => {
   // you have to clear all the decks before calling setUpGame
