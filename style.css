@@ -1,11 +1,25 @@
-.card-stack,
-.card {
+body {
+  background-color: rgb(221, 165, 10);
+}
+
+.card-stack {
   border-style: solid;
   padding: 60px 30px;
   margin: 10px 5px;
-  background-color: white;
+  background-image: white;
   max-height: 50px;
-  max-width: 30px;
+  border-radius: 10%;
+}
+
+.card {
+  border-style: solid;
+  padding: 60px 30px;
+  margin: 10px 10px;
+  background-image: white;
+  max-height: 50px;
+  font-size: 25px;
+  vertical-align: text-top;
+  border-radius: 10%;
 }
 
 div {
@@ -15,7 +29,6 @@ div {
 #top-row {
   display: flex;
   justify-content: space-between;
-  border-style: solid;
 }
 
 .main-four {
@@ -48,6 +61,16 @@ ul {
   margin-top: 5px;
 }
 
+.glow {
+  border-color: yellow;
+}
+
 .facedown {
-  background-color: orange;
+  background-image: linear-gradient(
+    to bottom right,
+    green,
+    blue,
+    orange,
+    violet
+  );
 }
