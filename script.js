@@ -109,6 +109,17 @@ const draw = () => {
   } else {
     deckHTML.classList.remove('facedown')
   }
+  movableCardsHTML = getAvailableHTMLCards()
+  stacks.forEach((stack) => {
+    stack.removeEventListener('click', myListenerStack)
+  })
+  movableCardsHTML.forEach((card) => {
+    card.addEventListener('click', myListenerCard)
+  })
+}
+
+const resetTurn = () => {
+  movableCardsHTML = getAvailableHTMLCards()
   stacks.forEach((stack) => {
     stack.removeEventListener('click', myListenerStack)
   })
@@ -238,8 +249,10 @@ const addCardFromMainSevenToMainFour = (stack) => {
 const createNewDivForMainSeven = (stack) => {
   let newDiv = document.createElement('div')
   newDiv.innerHTML = cardHTML.innerHTML
+  newDiv.style.backgroundColor = 'white'
   newDiv.style.color = cardHTML.style.color
   newDiv.classList = cardHTML.classList
+  newDiv.classList.add('main-seven')
   stack.appendChild(newDiv)
   stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
 }
@@ -271,21 +284,54 @@ const pickCard = (card) => {
 }
 
 function myListenerCard(card) {
-  console.log(card.path[0])
   pickCard(card.path[0])
 }
 
+const findEmptyStack = () => {
+  for (let j = 0; j < stacks.length; j++) {
+    for (let i = 0; i < stacks[j].classList.length; i++) {
+      if (stacks[j].classList[i] === 'empty') {
+        return stacks[j]
+      }
+    }
+  }
+}
+
+const findRightMainFour = () => {
+  if (cardHTML.innerText[0] === 'A') {
+    for (let i = 0; i < 4; i++) {
+      if (mainFourHTML[i].innerText === '') {
+        return mainFourHTML[i]
+      }
+    }
+    resetTurn()
+  } else {
+    for (let i = 0; i < 4; i++) {
+      if (mainFourHTML[i].innerText[2] === cardHTML.innerText[2]) {
+        return mainFourHTML[i]
+      }
+    }
+    resetTurn()
+  }
+}
+
 function myListenerStack(stack) {
-  console.log('here')
-  console.log(stack.path[1])
-  placeCard(stack.path[1])
+  if (stack.path[1].id === 'main-seven') {
+    let emptyStack = findEmptyStack()
+    emptyStack.classList.remove('empty')
+    placeCard(emptyStack)
+  } else if (stack.path[1].id === 'main-four-container') {
+    console.log(findRightMainFour())
+    placeCard(findRightMainFour())
+  } else {
+    placeCard(stack.path[1])
+  }
 }
 
 document.querySelector('button').addEventListener('click', () => {
   fillDeck()
   setUpGame()
   movableCardsHTML = getAvailableHTMLCards()
-  counter = 0
   movableCardsHTML.forEach((card) => {
     card.addEventListener('click', myListenerCard)
   })
@@ -301,6 +347,7 @@ const placeCard = (stack) => {
             // Moving card from drawn into mainFour
             addCardFromDrawnToMainFour(stack)
             checkWin()
+            movableCardsHTML = getAvailableHTMLCards()
             stacks.forEach((stack) => {
               stack.removeEventListener('click', myListenerStack)
             })
@@ -319,7 +366,11 @@ const placeCard = (stack) => {
             mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
               'facedown'
             )
+            mainSevenHTML[getStack(cardHTML)].lastChild.classList.add(
+              'main-seven'
+            )
             checkWin()
+            movableCardsHTML = getAvailableHTMLCards()
             stacks.forEach((stack) => {
               stack.removeEventListener('click', myListenerStack)
             })
@@ -334,6 +385,7 @@ const placeCard = (stack) => {
             showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
             mainFourHTML[getStack(cardHTML)].innerText = ''
             mainFourHTML[getStack(cardHTML)].style.color = 'black'
+            movableCardsHTML = getAvailableHTMLCards()
             stacks.forEach((stack) => {
               stack.removeEventListener('click', myListenerStack)
             })
@@ -359,6 +411,7 @@ const placeCard = (stack) => {
             // From the drawn pile
             addCardFromDrawnToMainFour(stack)
             checkWin()
+            movableCardsHTML = getAvailableHTMLCards()
             stacks.forEach((stack) => {
               stack.removeEventListener('click', myListenerStack)
             })
@@ -367,9 +420,10 @@ const placeCard = (stack) => {
             })
           } else {
             // From the mainSeven
+            console.log('moving other card from mainSeven into mainFour')
             addCardFromMainSevenToMainFour(stack)
             if (mainSeven[getStack(cardHTML)].length === 0) {
-              mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
+              mainSevenHTML[getStack(cardHTML)].classList.add('empty')
             } else {
               showCard(
                 mainSevenHTML[getStack(cardHTML)].lastChild,
@@ -380,26 +434,24 @@ const placeCard = (stack) => {
               mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
                 'facedown'
               )
+              mainSevenHTML[getStack(cardHTML)].lastChild.classList.add(
+                'main-seven'
+              )
             }
             checkWin()
-            stacks.forEach((stack) => {
-              stack.removeEventListener('click', myListenerStack)
-            })
-            movableCardsHTML.forEach((card) => {
-              card.addEventListener('click', myListenerCard)
-            })
+            resetTurn()
           }
         }
       }
     } else {
       // Error handling
+      movableCardsHTML = getAvailableHTMLCards()
       stacks.forEach((stack) => {
         stack.removeEventListener('click', myListenerStack)
       })
       movableCardsHTML.forEach((card) => {
         card.addEventListener('click', myListenerCard)
       })
-      //move(getAvailableHTMLCards())
     }
   } else {
     // Moving cards to the mainSeven
@@ -427,19 +479,15 @@ const placeCard = (stack) => {
         if (drawn.length !== 0) {
           showCard(drawnHTML, drawn[drawn.length - 1])
         } else {
+          console.log('right')
           drawnHTML.innerText = ''
-          drawnHTML.color = 'black'
+          drawnHTML.style.color = 'black'
+          drawnHTML.style.backgroundColor = ''
         }
         drawnHTML.setAttribute('id', 'drawn')
-        stacks.forEach((stack) => {
-          stack.removeEventListener('click', myListenerStack)
-        })
-        movableCardsHTML.forEach((card) => {
-          card.addEventListener('click', myListenerCard)
-        })
+        resetTurn()
       } else if (isMainSeven(stack)) {
         //Move cards within the mainSeven stacks
-
         // Make changes in js arrays
         for (let i = 0; i < cardMoving.length; i++) {
           mainSeven[parseInt(stack.id) - 1].push(
@@ -479,7 +527,7 @@ const placeCard = (stack) => {
           )
           resize(mainSevenHTML[originalStackIndex])
         } else {
-          mainSevenHTML[originalStackIndex].style.borderStyle = 'solid'
+          mainSevenHTML[originalStackIndex].classList.add('empty')
         }
         // Code below fixes a weird bug -- can't really explain why
         if (switchOrder === true) {
@@ -489,13 +537,13 @@ const placeCard = (stack) => {
             switchOrder = false
           }
         }
+        movableCardsHTML = getAvailableHTMLCards()
         stacks.forEach((stack) => {
           stack.removeEventListener('click', myListenerStack)
         })
         movableCardsHTML.forEach((card) => {
           card.addEventListener('click', myListenerCard)
         })
-        //moveTurn = true
       } else {
         // Moving card from mainFour to mainSeven
         mainSeven[parseInt(stack.id) - 1].push(
@@ -515,6 +563,7 @@ const placeCard = (stack) => {
           mainFourHTML[parseInt(cardHTML.id) - 1].innerText = ''
           mainFourHTML[parseInt(cardHTML.id) - 1].color = 'black'
         }
+        movableCardsHTML = getAvailableHTMLCards()
         stacks.forEach((stack) => {
           stack.removeEventListener('click', myListenerStack)
         })
@@ -524,13 +573,4 @@ const placeCard = (stack) => {
       }
     }
   }
-}
-
-const move = (movableCardsHTML) => {
-  movableCardsHTML.forEach((card) => {
-    card.addEventListener('click', pickCard(card))
-  })
-  stacks.forEach((stack) => {
-    stack.addEventListener('click', placeCard(stack))
-  })
 }
