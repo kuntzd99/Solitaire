@@ -1,5 +1,6 @@
 body {
-  background-color: rgb(221, 165, 10);
+  background-color: rgb(239, 171, 44);
+  font-family: 'Itim', cursive;
 }
 
 .card-stack {
@@ -68,10 +69,11 @@ ul {
 .facedown {
   background-image: linear-gradient(
     to bottom right,
-    green,
-    blue,
-    orange,
-    violet
+    #262626,
+    red,
+    #eaeaea,
+    violet,
+    #262626
   );
 }
 
