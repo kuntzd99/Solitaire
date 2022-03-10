@@ -48,6 +48,7 @@ const drawnHTML = document.querySelector('#drawn')
 const mainSevenHTML = document.querySelectorAll('.main-stack')
 const mainFourHTML = document.querySelectorAll('.main-four')
 const stacks = document.querySelectorAll('.main')
+const infoParagraph = document.querySelector('#info')
 
 const showCard = (div, card) => {
   /*
@@ -176,7 +177,6 @@ let cardMoving = []
 let cardHTML = 0
 
 const getCardMoving = (card) => {
-  console.log(card)
   cardMoving = []
   if (card.id === 'drawn') {
     cardMoving.push(drawn[drawn.length - 1])
@@ -213,7 +213,6 @@ const getCardMoving = (card) => {
       mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
     )
   }
-  console.log(cardMoving)
   cardHTML = card
 }
 
@@ -351,18 +350,11 @@ document.querySelector('button').addEventListener('click', () => {
   })
 })
 
-// const hasFaceDown = (stack) => {
-//   for (let j = 0; j < stack.children.length; j++) {
-//     for (let i = 0; i < stack.children[j].classList.length; i++) {
-//       if (stack.children[j].classList[i] === 'facedown') {
-//         return true
-//       }
-//     }
-//     return false
-//   }
-// }
-
-//let switchCardsMoving = false
+const addIdsToMainFour = () => {
+  for (let i = 1; i < 5; i++) {
+    mainFourHTML[i - 1].setAttribute('id', i.toString())
+  }
+}
 
 const placeCard = (stack) => {
   // Get card to where it is going
@@ -464,12 +456,7 @@ const placeCard = (stack) => {
     ) {
       if (mainSeven[parseInt(stack.id) - 1].length === 0) {
         stack.style.borderStyle = 'none'
-        //switchOrder = true
       }
-      // if (hasFaceDown(mainSevenHTML[parseInt(stack.id) - 1]) === false) {
-      //   switchCardsMoving = true
-      //   console.log('switchCardsMoving')
-      // }
       if (cardHTML.id === 'drawn') {
         // Add card from drawn to mainSeven
         mainSeven[parseInt(stack.id) - 1].push(drawn.pop())
@@ -489,26 +476,11 @@ const placeCard = (stack) => {
         //Move cards within the mainSeven stacks
 
         // Make changes in js arrays
-
-        // if (switchCardsMoving && cardMoving.length > 1) {
-        //   let reversedArray = []
-        //   for (let i = 0; i < cardMoving.length; i++) {
-        //     reversedArray.push(mainSeven[getStack(cardHTML)].pop())
-        //   }
-        //   console.log(reversedArray)
-        //   reversedArray = reversedArray.reverse()
-        //   for (let i = 0; i < cardMoving.length; i++) {
-        //     mainSeven[parseInt(stack.id)].push(reversedArray.pop())
-        //   }
-        //   switchCardsMoving = false
-        // } else {
-
         let cardsMoved = cardMoving.length
         for (let i = 0; i < cardsMoved; i++) {
           mainSeven[parseInt(stack.id) - 1].push(cardMoving.pop())
           mainSeven[getStack(cardHTML)].pop()
         }
-        //}
         // Define variable that represents index of stack originally clicked
         let originalStackIndex = getStack(cardHTML)
         // Make changes in HTML
@@ -541,14 +513,6 @@ const placeCard = (stack) => {
         } else {
           mainSevenHTML[originalStackIndex].classList.add('empty')
         }
-        // Code below fixes a weird bug -- can't really explain why
-        // if (switchOrder === true) {
-        //   if (cardMoving.length > 1) {
-        //     mainSeven[getStack(cardHTML)] =
-        //       mainSeven[getStack(cardHTML)].reverse()
-        //     switchOrder = false
-        //   }
-        // }
         resetTurn()
       } else {
         // Moving card from mainFour to mainSeven
@@ -569,10 +533,7 @@ const placeCard = (stack) => {
               mainFour[parseInt(cardHTML.id) - 1].length - 1
             ]
           )
-          mainFourHTML[parseInt(cardHTML.id) - 1].setAttribute('id', '1')
-          let index = cardHTML.id.toString()
-          //mainFourHTML[parseInt(cardHTML.id) - 1].id = cardHTML.id.toString()
-          //console.log(mainFourHTML[parseInt(cardHTML.ID) - 1].id)
+          console.log(cardHTML.id.toString())
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main-four')
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('card-stack')
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main')
@@ -582,6 +543,7 @@ const placeCard = (stack) => {
           mainFourHTML[parseInt(cardHTML.id) - 1].color = 'black'
         }
         cardHTML.removeAttribute('id')
+        addIdsToMainFour()
         resetTurn()
       }
     }
