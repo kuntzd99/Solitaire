@@ -114,6 +114,9 @@ const draw = () => {
 }
 
 const resetTurn = () => {
+  if (cardHTML !== 0) {
+    cardHTML.classList.remove('glow')
+  }
   movableCardsHTML = getAvailableHTMLCards()
   stacks.forEach((stack) => {
     stack.removeEventListener('click', myListenerStack)
@@ -259,6 +262,7 @@ const createNewDivForMainSeven = (stack) => {
   newDiv.style.backgroundColor = 'white'
   newDiv.style.color = cardHTML.style.color
   newDiv.classList = cardHTML.classList
+  newDiv.classList.remove('glow')
   newDiv.classList.add('main-seven')
   stack.appendChild(newDiv)
   stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
@@ -282,6 +286,7 @@ let counter = 0
 
 const pickCard = (card) => {
   getCardMoving(card)
+  cardHTML.classList.add('glow')
   movableCardsHTML.forEach((card) => {
     card.removeEventListener('click', myListenerCard)
   })
@@ -346,6 +351,19 @@ document.querySelector('button').addEventListener('click', () => {
   })
 })
 
+const hasFaceDown = (stack) => {
+  for (let j = 0; j < stack.children.length; j++) {
+    for (let i = 0; i < stack.children[j].classList.length; i++) {
+      if (stack.children[j].classList[i] === 'facedown') {
+        return true
+      }
+    }
+    return false
+  }
+}
+
+let switchCardsMoving = false
+
 const placeCard = (stack) => {
   // Get card to where it is going
   if (isMainFour(stack)) {
@@ -373,13 +391,7 @@ const placeCard = (stack) => {
               'main-seven'
             )
             checkWin()
-            movableCardsHTML = getAvailableHTMLCards()
-            stacks.forEach((stack) => {
-              stack.removeEventListener('click', myListenerStack)
-            })
-            movableCardsHTML.forEach((card) => {
-              card.addEventListener('click', myListenerCard)
-            })
+            resetTurn()
           } else {
             // Moving an ace from one mainFour stack to another
             mainFour[parseInt(stack.id) - 1].push(
@@ -388,13 +400,7 @@ const placeCard = (stack) => {
             showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
             mainFourHTML[getStack(cardHTML)].innerText = ''
             mainFourHTML[getStack(cardHTML)].style.color = 'black'
-            movableCardsHTML = getAvailableHTMLCards()
-            stacks.forEach((stack) => {
-              stack.removeEventListener('click', myListenerStack)
-            })
-            movableCardsHTML.forEach((card) => {
-              card.addEventListener('click', myListenerCard)
-            })
+            resetTurn()
           }
         }
       } else {
@@ -414,13 +420,7 @@ const placeCard = (stack) => {
             // From the drawn pile
             addCardFromDrawnToMainFour(stack)
             checkWin()
-            movableCardsHTML = getAvailableHTMLCards()
-            stacks.forEach((stack) => {
-              stack.removeEventListener('click', myListenerStack)
-            })
-            movableCardsHTML.forEach((card) => {
-              card.addEventListener('click', myListenerCard)
-            })
+            resetTurn()
           } else {
             // From the mainSeven
             addCardFromMainSevenToMainFour(stack)
@@ -447,13 +447,7 @@ const placeCard = (stack) => {
       }
     } else {
       // Error handling
-      movableCardsHTML = getAvailableHTMLCards()
-      stacks.forEach((stack) => {
-        stack.removeEventListener('click', myListenerStack)
-      })
-      movableCardsHTML.forEach((card) => {
-        card.addEventListener('click', myListenerCard)
-      })
+      resetTurn()
     }
   } else {
     // Moving cards to the mainSeven
@@ -471,6 +465,9 @@ const placeCard = (stack) => {
       if (mainSeven[parseInt(stack.id) - 1].length === 0) {
         stack.style.borderStyle = 'none'
         switchOrder = true
+      }
+      if (hasFaceDown(mainSevenHTML[parseInt(stack.id) - 1]) === false) {
+        switchCardsMoving = true
       }
       if (cardHTML.id === 'drawn') {
         // Add card from drawn to mainSeven
@@ -490,12 +487,22 @@ const placeCard = (stack) => {
       } else if (isMainSeven(cardHTML)) {
         //Move cards within the mainSeven stacks
         // Make changes in js arrays
-        for (let i = 0; i < cardMoving.length; i++) {
-          mainSeven[parseInt(stack.id) - 1].push(
-            mainSeven[getStack(cardHTML)].pop()
-          )
+        if (switchCardsMoving && cardMoving.length > 1) {
+          for (let i = cardMoving.length; i >= 0; i--) {
+            mainSeven[parseInt(stack.id) - 1].push(
+              mainSeven[getStack(cardHTML)].pop()
+            )
+          }
+          mainSeven[parseInt(stack.id) - 1] =
+            mainSeven[parseInt(stack.id) - 1].reverse()
+          mainSeven[parseInt(stack.id) - 1].pop()
+        } else {
+          for (let i = 0; i < cardMoving.length; i++) {
+            mainSeven[parseInt(stack.id) - 1].push(
+              mainSeven[getStack(cardHTML)].pop()
+            )
+          }
         }
-
         // Define variable that represents index of stack originally clicked
         let originalStackIndex = getStack(cardHTML)
         // Make changes in HTML
@@ -538,13 +545,7 @@ const placeCard = (stack) => {
             switchOrder = false
           }
         }
-        movableCardsHTML = getAvailableHTMLCards()
-        stacks.forEach((stack) => {
-          stack.removeEventListener('click', myListenerStack)
-        })
-        movableCardsHTML.forEach((card) => {
-          card.addEventListener('click', myListenerCard)
-        })
+        resetTurn()
       } else {
         // Moving card from mainFour to mainSeven
         mainSeven[parseInt(stack.id) - 1].push(
