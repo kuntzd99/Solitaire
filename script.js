@@ -185,15 +185,27 @@ const getCardMoving = (card) => {
   } else if (isMainSeven(card)) {
     for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
       for (let j = 0; j < card.innerText.length; j++) {
-        if (
-          (mainSeven[getStack(card)][i].symbol === card.innerText[j] ||
-            mainSeven[getStack(card)][i].symbol ===
-              parseInt(card.innerText[j])) &&
-          mainSeven[getStack(card)][i].color === card.style.color
-        ) {
-          for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
-            // The card to compare is at the farthest index
-            cardMoving.push(mainSeven[getStack(card)][c])
+        if (mainSeven[getStack(card)][i].symbol === 10) {
+          if (
+            card.innerText.slice(j, j + 2) === '10' &&
+            mainSeven[getStack(card)][i].color === card.style.color
+          ) {
+            for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
+              // The card to compare is at the farthest index
+              cardMoving.push(mainSeven[getStack(card)][c])
+            }
+          }
+        } else {
+          if (
+            (mainSeven[getStack(card)][i].symbol === card.innerText[j] ||
+              mainSeven[getStack(card)][i].symbol ===
+                parseInt(card.innerText[j])) &&
+            mainSeven[getStack(card)][i].color === card.style.color
+          ) {
+            for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
+              // The card to compare is at the farthest index
+              cardMoving.push(mainSeven[getStack(card)][c])
+            }
           }
         }
       }
@@ -205,6 +217,7 @@ const getCardMoving = (card) => {
   }
   mainFourHTML[parseInt(cardHTML.id) - 1]
   cardHTML = card
+  console.log(cardMoving)
 }
 
 const isMainFour = (stack) => {
@@ -307,7 +320,10 @@ const findRightMainFour = () => {
     resetTurn()
   } else {
     for (let i = 0; i < 4; i++) {
-      if (mainFourHTML[i].innerText[2] === cardHTML.innerText[2]) {
+      if (
+        mainFourHTML[i].innerText[mainFourHTML[i].innerText.length - 1] ===
+        cardHTML.innerText[cardHTML.innerText.length - 1]
+      ) {
         return mainFourHTML[i]
       }
     }
@@ -321,7 +337,6 @@ function myListenerStack(stack) {
     emptyStack.classList.remove('empty')
     placeCard(emptyStack)
   } else if (stack.path[1].id === 'main-four-container') {
-    console.log(findRightMainFour())
     placeCard(findRightMainFour())
   } else {
     placeCard(stack.path[1])
@@ -420,7 +435,6 @@ const placeCard = (stack) => {
             })
           } else {
             // From the mainSeven
-            console.log('moving other card from mainSeven into mainFour')
             addCardFromMainSevenToMainFour(stack)
             if (mainSeven[getStack(cardHTML)].length === 0) {
               mainSevenHTML[getStack(cardHTML)].classList.add('empty')
@@ -479,7 +493,6 @@ const placeCard = (stack) => {
         if (drawn.length !== 0) {
           showCard(drawnHTML, drawn[drawn.length - 1])
         } else {
-          console.log('right')
           drawnHTML.innerText = ''
           drawnHTML.style.color = 'black'
           drawnHTML.style.backgroundColor = ''
