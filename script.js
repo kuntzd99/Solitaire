@@ -70,12 +70,19 @@ const resize = (htmlStack) => {
 const clearGame = () => {
   deckHTML.classList.remove('empty')
   drawnHTML.classList.remove('empty')
-  stacks.forEach((stack) => {
-    stack.classList.remove('empty')
-    for (let i = 0; i < stack.children.length; i++) {
-      stack.removeChild(stack.firstChild)
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j < mainSevenHTML[i].children.length; j++) {
+      mainSevenHTML[i].removeChild(mainSevenHTML[i].lastChild)
     }
-  })
+  }
+  for (let i = 0; i < 4; i++) {
+    mainFourHTML[i].innerText = ''
+    mainFourHTML[i].color = 'black'
+    mainFourHTML[i].backgroundColor = ''
+  }
+  drawnHTML.innerText = ''
+  drawnHTML.color = 'black'
+  drawnHTML.backgroundColor = ''
   mainFour.forEach((array) => {
     array = []
   })
@@ -208,7 +215,8 @@ const getCardMoving = (card) => {
         if (mainSeven[getStack(card)][i].symbol === 10) {
           if (
             card.innerText.slice(j, j + 2) === '10' &&
-            mainSeven[getStack(card)][i].color === card.style.color
+            mainSeven[getStack(card)][i].suit ===
+              card.innerText[card.innerText.length - 1]
           ) {
             for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
               // The card to compare is at the farthest index
@@ -220,7 +228,8 @@ const getCardMoving = (card) => {
             (mainSeven[getStack(card)][i].symbol === card.innerText[j] ||
               mainSeven[getStack(card)][i].symbol ===
                 parseInt(card.innerText[j])) &&
-            mainSeven[getStack(card)][i].color === card.style.color
+            mainSeven[getStack(card)][i].suit ===
+              card.innerText[card.innerText.length - 1]
           ) {
             for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
               // The card to compare is at the farthest index
@@ -235,6 +244,7 @@ const getCardMoving = (card) => {
       mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
     )
   }
+  console.log(cardMoving)
   cardHTML = card
 }
 
@@ -259,14 +269,18 @@ const isMainSeven = (stack) => {
 const addCardFromDrawnToMainFour = (stack) => {
   mainFour[parseInt(stack.id) - 1].push(drawn.pop())
   showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
-  showCard(drawnHTML, drawn[drawn.length - 1])
+  if (drawn.length !== 0) {
+    showCard(drawnHTML, drawn[drawn.length - 1])
+  } else {
+    drawnHTML.classList.add('empty')
+    drawnHTML.innerHTML = ''
+    drawnHTML.style.color = 'black'
+    drawnHTML.style.backgroundColor = ''
+  }
   mainFourHTML[parseInt(stack.id) - 1].classList.add(
     (parseInt(stack.id) - 1).toString()
   )
   drawnHTML.setAttribute('id', 'drawn')
-  if (drawn.length === 0) {
-    drawnHTML.classList.add('empty')
-  }
 }
 
 const addCardFromMainSevenToMainFour = (stack) => {
@@ -385,12 +399,12 @@ function myListenerStack(stack) {
 const errorButton = document.createElement('button')
 
 document.querySelector('button').addEventListener('click', () => {
-  clearGame()
+  //clearGame()
   fillDeck()
   shuffle(deck)
   setUpGame()
   document.querySelector('button').innerText = 'New Game'
-  errorButton.innerText = 'Click to cancel move'
+  errorButton.innerText = 'Cancel Move'
   document.querySelector('#other').appendChild(errorButton)
   movableCardsHTML = getAvailableHTMLCards()
   movableCardsHTML.forEach((card) => {
@@ -410,6 +424,7 @@ const addIdsToMainFour = () => {
 
 const placeCard = (stack) => {
   // Get card to where it is going
+  console.log(stack)
   if (isMainFour(stack)) {
     if (cardMoving.length === 1) {
       if (stack.hasChildNodes() === false) {
@@ -422,18 +437,22 @@ const placeCard = (stack) => {
           } else if (isMainSeven(cardHTML)) {
             // Moving card from mainSeven into mainFour
             addCardFromMainSevenToMainFour(stack)
-            showCard(
-              mainSevenHTML[getStack(cardHTML)].lastChild,
-              mainSeven[getStack(cardHTML)][
-                mainSeven[getStack(cardHTML)].length - 1
-              ]
-            )
-            mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
-              'facedown'
-            )
-            mainSevenHTML[getStack(cardHTML)].lastChild.classList.add(
-              'main-seven'
-            )
+            if (mainSeven[getStack(cardHTML)].length !== 0) {
+              showCard(
+                mainSevenHTML[getStack(cardHTML)].lastChild,
+                mainSeven[getStack(cardHTML)][
+                  mainSeven[getStack(cardHTML)].length - 1
+                ]
+              )
+              mainSevenHTML[getStack(cardHTML)].lastChild.classList.remove(
+                'facedown'
+              )
+              mainSevenHTML[getStack(cardHTML)].lastChild.classList.add(
+                'main-seven'
+              )
+            } else {
+              mainSevenHTML[getStack(cardHTML)].classList.add('empty')
+            }
             checkWin()
             resetTurn()
           } else {
@@ -585,7 +604,6 @@ const placeCard = (stack) => {
               mainFour[parseInt(cardHTML.id) - 1].length - 1
             ]
           )
-          console.log(cardHTML.id.toString())
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main-four')
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('card-stack')
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main')
