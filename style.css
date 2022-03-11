@@ -3,6 +3,32 @@ body {
   font-family: 'Itim', cursive;
 }
 
+footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: blanchedalmond;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin-top: 30px;
+}
+
+header {
+  font-size: 40px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin-top: 30px;
+  font-family: 'Secular One', sans-serif;
+}
+
+a {
+  font-size: 20px;
+}
+
 .card-stack {
   border-style: solid;
   padding: 60px 30px;

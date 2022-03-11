@@ -306,8 +306,6 @@ const createNewDivForMainSeven = (stack) => {
   stack.lastChild.classList.add((parseInt(stack.id) - 1).toString())
 }
 
-//let switchOrder = false
-
 const checkWin = () => {
   let total = 0
   for (let i = 0; i < 4; i++) {
@@ -403,6 +401,7 @@ document.querySelector('button').addEventListener('click', () => {
   fillDeck()
   shuffle(deck)
   setUpGame()
+  document.querySelector('header').remove()
   document.querySelector('button').innerText = 'New Game'
   errorButton.innerText = 'Cancel Move'
   document.querySelector('#other').appendChild(errorButton)
