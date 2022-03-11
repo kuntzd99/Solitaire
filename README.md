@@ -34,6 +34,7 @@ To start the game, press the "Play" button. You can also click the link at the b
 
 - [ ] Add an undo button
 - [ ] Add a hint button
+- [ ] An option to draw three at a time
 - [ ] Add a cool animation for winning
 
 ---

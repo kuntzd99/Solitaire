@@ -117,6 +117,8 @@ const setUpGame = () => {
   deckHTML.classList.add('facedown')
 }
 
+let deckEmpty = false
+
 const resetDeck = () => {
   deckHTML.classList.add('facedown')
   drawnHTML.innerText = ''
@@ -126,6 +128,7 @@ const resetDeck = () => {
   drawn = []
   if (deck.length === 0) {
     deckHTML.classList.add('empty')
+    deckEmpty = true
   }
 }
 
@@ -162,6 +165,15 @@ deckHTML.addEventListener('click', () => {
     resetDeck()
   }
 })
+
+while (deckEmpty === false) {
+  deckHTML.addEventListener('mouseenter', () => {
+    deckHTML.style.borderColor = 'yellow'
+  })
+  deckHTML.addEventListener('mouseleave', () => {
+    deckHTML.style.borderColor = 'gray'
+  })
+}
 
 const getAvailableHTMLCards = () => {
   let cards = []
@@ -244,7 +256,6 @@ const getCardMoving = (card) => {
       mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
     )
   }
-  console.log(cardMoving)
   cardHTML = card
 }
 
@@ -400,12 +411,17 @@ function myListenerStack(stack) {
 // Needed for if you click on a card that can't go anywhere
 const errorButton = document.createElement('button')
 
+playedGame = false
+
 document.querySelector('button').addEventListener('click', () => {
   clearGame()
   fillDeck()
   shuffle(deck)
   setUpGame()
-  document.querySelector('header').remove()
+  if (playedGame === false) {
+    document.querySelector('header').remove()
+  }
+  playedGame = false
   document.querySelector('button').innerText = 'New Game'
   errorButton.innerText = 'Cancel Move'
   document.querySelector('#other').appendChild(errorButton)
@@ -429,7 +445,6 @@ const addIdsToMainFour = () => {
 // Second click... BEAST of a function
 const placeCard = (stack) => {
   // Get card to where it is going
-  console.log(stack)
   if (isMainFour(stack)) {
     if (cardMoving.length === 1) {
       if (stack.hasChildNodes() === false) {
