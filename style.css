@@ -100,18 +100,6 @@ ul {
 }
 
 .facedown {
-  /* background-image: linear-gradient(
-    to bottom right,
-    #262626,
-    rgb(10, 198, 10),
-    #eaeaea,
-    rgb(126, 7, 126),
-    #262626
-  ); */
-  /* background-image: radial-gradient(
-    farthest-corner at 40px 40px,
-    #f35 0%,
-    #43e 100% */
   border-style: solid;
   border-color: gray;
   background-image: linear-gradient(to bottom right, brown, cyan);

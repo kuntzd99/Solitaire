@@ -71,6 +71,8 @@ const resize = (htmlStack) => {
 const clearGame = () => {
   for (let i = 0; i < 7; i++) {
     mainSevenHTML[i].classList.remove('empty')
+    mainSevenHTML[i].style.borderStyle = ''
+    //mainSevenHTML[i].style.color = 'black'
     while (mainSevenHTML[i].firstChild) {
       mainSevenHTML[i].removeChild(mainSevenHTML[i].lastChild)
     }
@@ -125,7 +127,10 @@ const resetDeck = () => {
   deck = drawn.reverse()
   drawn = []
   if (deck.length === 0) {
+    deckHTML.style.color = 'black'
+    deckHTML.style.borderColor = 'black'
     deckEmpty = true
+    deckHTML.classList.remove('facedown')
   }
 }
 
@@ -139,6 +144,7 @@ const draw = () => {
 }
 
 const resetTurn = () => {
+  secondListenerOn = false
   if (cardHTML !== 0) {
     cardHTML.classList.remove('glow')
   }
@@ -215,45 +221,47 @@ let cardMoving = []
 let cardHTML = 0
 
 const getCardMoving = (card) => {
-  cardMoving = []
-  if (card.id === 'drawn') {
-    cardMoving.push(drawn[drawn.length - 1])
-  } else if (isMainSeven(card)) {
-    for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
-      for (let j = 0; j < card.innerText.length; j++) {
-        if (mainSeven[getStack(card)][i].symbol === 10) {
-          if (
-            card.innerText.slice(j, j + 2) === '10' &&
-            mainSeven[getStack(card)][i].suit ===
-              card.innerText[card.innerText.length - 1]
-          ) {
-            for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
-              // The card to compare is at the farthest index
-              cardMoving.push(mainSeven[getStack(card)][c])
+  if (secondListenerOn === false) {
+    cardMoving = []
+    cardHTML = card
+    if (card.id === 'drawn') {
+      cardMoving.push(drawn[drawn.length - 1])
+    } else if (isMainSeven(card)) {
+      for (let i = 0; i < mainSeven[getStack(card)].length; i++) {
+        for (let j = 0; j < card.innerText.length; j++) {
+          if (mainSeven[getStack(card)][i].symbol === 10) {
+            if (
+              card.innerText.slice(j, j + 2) === '10' &&
+              mainSeven[getStack(card)][i].suit ===
+                card.innerText[card.innerText.length - 1]
+            ) {
+              for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
+                // The card to compare is at the farthest index
+                cardMoving.push(mainSeven[getStack(card)][c])
+              }
             }
-          }
-        } else {
-          if (
-            (mainSeven[getStack(card)][i].symbol === card.innerText[j] ||
-              mainSeven[getStack(card)][i].symbol ===
-                parseInt(card.innerText[j])) &&
-            mainSeven[getStack(card)][i].suit ===
-              card.innerText[card.innerText.length - 1]
-          ) {
-            for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
-              // The card to compare is at the farthest index
-              cardMoving.push(mainSeven[getStack(card)][c])
+          } else {
+            if (
+              (mainSeven[getStack(card)][i].symbol === card.innerText[j] ||
+                mainSeven[getStack(card)][i].symbol ===
+                  parseInt(card.innerText[j])) &&
+              mainSeven[getStack(card)][i].suit ===
+                card.innerText[card.innerText.length - 1]
+            ) {
+              for (let c = mainSeven[getStack(card)].length - 1; c >= i; c--) {
+                // The card to compare is at the farthest index
+                cardMoving.push(mainSeven[getStack(card)][c])
+              }
             }
           }
         }
       }
+    } else {
+      cardMoving.push(
+        mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
+      )
     }
-  } else {
-    cardMoving.push(
-      mainFour[getStack(card)][mainFour[getStack(card)].length - 1]
-    )
   }
-  cardHTML = card
 }
 
 const isMainFour = (stack) => {
@@ -342,6 +350,7 @@ const shuffle = (array) => {
 // First click
 const pickCard = (card) => {
   getCardMoving(card)
+  secondListenerOn = true
   cardHTML.classList.add('glow')
   movableCardsHTML.forEach((card) => {
     card.removeEventListener('click', myListenerCard)
@@ -393,6 +402,7 @@ const findRightMainFour = () => {
 
 // Second magic function for second click
 function myListenerStack(stack) {
+  secondListenerOn = true
   if (stack.path[1].id === 'main-seven') {
     let emptyStack = findEmptyStack()
     emptyStack.classList.remove('empty')
@@ -407,24 +417,32 @@ function myListenerStack(stack) {
 // Needed for if you click on a card that can't go anywhere
 const errorButton = document.createElement('button')
 
+// Reset button
 playedGame = false
-
 document.querySelector('button').addEventListener('click', () => {
+  deckEmpty = false
   clearGame()
   fillDeck()
   shuffle(deck)
   setUpGame()
   if (playedGame === false) {
     document.querySelector('header').remove()
+    document.querySelector('button').innerText = 'New Game'
+    errorButton.innerText = 'Cancel Move'
+    document.querySelector('#other').appendChild(errorButton)
+    playedGame = true
+  } else {
+    cardHTML = 0
+    cardMoving = []
   }
-  playedGame = true
-  document.querySelector('button').innerText = 'New Game'
-  errorButton.innerText = 'Cancel Move'
-  document.querySelector('#other').appendChild(errorButton)
-  movableCardsHTML = getAvailableHTMLCards()
-  movableCardsHTML.forEach((card) => {
-    card.addEventListener('click', myListenerCard)
-  })
+  if (secondListenerOn) {
+    resetTurn()
+  } else {
+    movableCardsHTML = getAvailableHTMLCards()
+    movableCardsHTML.forEach((card) => {
+      card.addEventListener('click', myListenerCard)
+    })
+  }
 })
 
 errorButton.addEventListener('click', () => {
@@ -437,6 +455,8 @@ const addIdsToMainFour = () => {
     mainFourHTML[i - 1].setAttribute('id', i.toString())
   }
 }
+
+let secondListenerOn = false
 
 // Second click... BEAST of a function
 const placeCard = (stack) => {
@@ -468,6 +488,8 @@ const placeCard = (stack) => {
               )
             } else {
               mainSevenHTML[getStack(cardHTML)].classList.add('empty')
+              mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
+              //mainSevenHTML[getStack(cardHTML)].style.color = 'black'
             }
             checkWin()
             resetTurn()
@@ -479,6 +501,13 @@ const placeCard = (stack) => {
             showCard(mainFourHTML[parseInt(stack.id) - 1], cardMoving[0])
             mainFourHTML[getStack(cardHTML)].innerText = ''
             mainFourHTML[getStack(cardHTML)].style.color = 'black'
+            mainFourHTML[getStack(cardHTML)].style.backgroundColor = ''
+            mainFourHTML[getStack(cardHTML)].classList.remove(
+              getStack(cardHTML).toString()
+            )
+            mainFourHTML[parseInt(stack.id) - 1].classList.add(
+              (parseInt(stack.id) - 1).toString()
+            )
             resetTurn()
           }
         }
@@ -504,7 +533,11 @@ const placeCard = (stack) => {
             // From the mainSeven
             addCardFromMainSevenToMainFour(stack)
             if (mainSeven[getStack(cardHTML)].length === 0) {
+              console.log('here')
               mainSevenHTML[getStack(cardHTML)].classList.add('empty')
+              mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
+              // mainSevenHTML[getStack(cardHTML)].style.color = 'black'
+              // mainSevenHTML[getStack(cardHTML)].style.innerText = ''
             } else {
               showCard(
                 mainSevenHTML[getStack(cardHTML)].lastChild,
@@ -613,7 +646,7 @@ const placeCard = (stack) => {
         cardHTML.classList.remove('main')
         createNewDivForMainSeven(stack)
         resize(stack)
-        if (mainFourHTML[parseInt(cardHTML.id) - 1].length !== 0) {
+        if (mainFour[parseInt(cardHTML.id) - 1].length !== 0) {
           showCard(
             mainFourHTML[parseInt(cardHTML.id) - 1],
             mainFour[parseInt(cardHTML.id) - 1][
@@ -624,9 +657,20 @@ const placeCard = (stack) => {
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('card-stack')
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main')
           mainFourHTML[parseInt(cardHTML.id) - 1].classList.remove('card')
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add(
+            (parseInt(cardHTML.id) - 1).toString()
+          )
         } else {
           mainFourHTML[parseInt(cardHTML.id) - 1].innerText = ''
-          mainFourHTML[parseInt(cardHTML.id) - 1].color = 'black'
+          mainFourHTML[parseInt(cardHTML.id) - 1].style.color = 'black'
+          mainFourHTML[parseInt(cardHTML.id) - 1].style.backgroundColor = ''
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main-four')
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add(
+            (parseInt(cardHTML.id) - 1).toString()
+          )
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.remove('card')
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('card-stack')
+          mainFourHTML[parseInt(cardHTML.id) - 1].classList.add('main')
         }
         cardHTML.removeAttribute('id')
         addIdsToMainFour()
