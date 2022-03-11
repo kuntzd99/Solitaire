@@ -38,8 +38,8 @@ const fillDeck = () => {
 }
 
 // Stacks in JS
-const mainSeven = [[], [], [], [], [], [], []]
-const mainFour = [[], [], [], []]
+let mainSeven = [[], [], [], [], [], [], []]
+let mainFour = [[], [], [], []]
 let drawn = []
 
 // Stacks in HTML
@@ -57,6 +57,7 @@ const showCard = (div, card) => {
   div.innerText = card.symbol + ' ' + card.suit
   div.style.color = card.color
   div.style.backgroundColor = 'white'
+  div.classList.remove('facedown')
 }
 
 const resize = (htmlStack) => {
@@ -71,7 +72,8 @@ const clearGame = () => {
   deckHTML.classList.remove('empty')
   drawnHTML.classList.remove('empty')
   for (let i = 0; i < 7; i++) {
-    for (let j = 0; j < mainSevenHTML[i].children.length; j++) {
+    mainSevenHTML[i].classList.remove('empty')
+    while (mainSevenHTML[i].firstChild) {
       mainSevenHTML[i].removeChild(mainSevenHTML[i].lastChild)
     }
   }
@@ -83,12 +85,9 @@ const clearGame = () => {
   drawnHTML.innerText = ''
   drawnHTML.color = 'black'
   drawnHTML.backgroundColor = ''
-  mainFour.forEach((array) => {
-    array = []
-  })
-  mainSeven.forEach((array) => {
-    array = []
-  })
+  deckHTML.classList.remove('facedown')
+  mainSeven = [[], [], [], [], [], [], []]
+  mainFour = [[], [], [], []]
   deck = []
   drawn = []
 }
@@ -107,8 +106,9 @@ const setUpGame = () => {
       if (newCard.covered) {
         newCardDiv.classList.add('facedown')
       } else {
-        showCard(newCardDiv, newCard)
         newCardDiv.classList.add('main-seven')
+        newCardDiv.classList.remove('facedown')
+        showCard(newCardDiv, newCard)
       }
       mainSevenHTML[index].appendChild(newCardDiv)
       resize(mainSevenHTML[index])
@@ -130,15 +130,11 @@ const resetDeck = () => {
 }
 
 const draw = () => {
-  if (deck[deck.length - 1]) {
-    newCard = deck.pop()
-    drawn.push(newCard)
-    drawnHTML.classList.add('card')
-    drawnHTML.setAttribute('id', 'drawn')
-    showCard(drawnHTML, newCard)
-  } else {
-    deckHTML.classList.remove('facedown')
-  }
+  newCard = deck.pop()
+  drawn.push(newCard)
+  drawnHTML.classList.add('card')
+  drawnHTML.setAttribute('id', 'drawn')
+  showCard(drawnHTML, newCard)
   resetTurn()
 }
 
@@ -156,9 +152,13 @@ const resetTurn = () => {
 }
 
 deckHTML.addEventListener('click', () => {
-  if (deck.length !== 0) {
+  if (deck.length > 0) {
+    if (deck.length === 1) {
+      deckHTML.classList.remove('facedown')
+    }
     draw()
   } else {
+    deckHTML.classList.add('facedown')
     resetDeck()
   }
 })
@@ -399,7 +399,7 @@ function myListenerStack(stack) {
 const errorButton = document.createElement('button')
 
 document.querySelector('button').addEventListener('click', () => {
-  //clearGame()
+  clearGame()
   fillDeck()
   shuffle(deck)
   setUpGame()
@@ -574,7 +574,7 @@ const placeCard = (stack) => {
               mainSeven[originalStackIndex].length - 1
             ]
           )
-          mainSevenHTML[originalStackIndex].lastChild.classList.toggle(
+          mainSevenHTML[originalStackIndex].lastChild.classList.remove(
             'facedown'
           )
           mainSevenHTML[originalStackIndex].lastChild.classList.add(
