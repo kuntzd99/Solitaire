@@ -533,7 +533,6 @@ const placeCard = (stack) => {
             // From the mainSeven
             addCardFromMainSevenToMainFour(stack)
             if (mainSeven[getStack(cardHTML)].length === 0) {
-              console.log('here')
               mainSevenHTML[getStack(cardHTML)].classList.add('empty')
               mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
               // mainSevenHTML[getStack(cardHTML)].style.color = 'black'
