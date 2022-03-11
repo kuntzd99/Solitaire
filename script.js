@@ -79,8 +79,8 @@ const clearGame = () => {
   }
   for (let i = 0; i < 4; i++) {
     mainFourHTML[i].innerText = ''
-    mainFourHTML[i].color = 'black'
-    mainFourHTML[i].backgroundColor = ''
+    mainFourHTML[i].style.color = 'black'
+    mainFourHTML[i].style.backgroundColor = ''
   }
   drawnHTML.innerText = ''
   drawnHTML.color = 'black'
@@ -332,10 +332,7 @@ const shuffle = (array) => {
   return array
 }
 
-let movableCardsHTML = getAvailableHTMLCards()
-
-let counter = 0
-
+// First click
 const pickCard = (card) => {
   getCardMoving(card)
   cardHTML.classList.add('glow')
@@ -347,10 +344,13 @@ const pickCard = (card) => {
   })
 }
 
+// Magic function thought of by John that
+// allows for event listener toggling
 function myListenerCard(card) {
   pickCard(card.path[0])
 }
 
+// Created because the mouse pointer doesn't recognize empty stacks
 const findEmptyStack = () => {
   for (let j = 0; j < stacks.length; j++) {
     for (let i = 0; i < stacks[j].classList.length; i++) {
@@ -361,6 +361,8 @@ const findEmptyStack = () => {
   }
 }
 
+// Created becasue mouse pointer groups the main four altogether becasue they're
+// in the same div
 const findRightMainFour = () => {
   if (cardHTML.innerText[0] === 'A') {
     for (let i = 0; i < 4; i++) {
@@ -382,6 +384,7 @@ const findRightMainFour = () => {
   }
 }
 
+// Second magic function for second click
 function myListenerStack(stack) {
   if (stack.path[1].id === 'main-seven') {
     let emptyStack = findEmptyStack()
@@ -394,6 +397,7 @@ function myListenerStack(stack) {
   }
 }
 
+// Needed for if you click on a card that can't go anywhere
 const errorButton = document.createElement('button')
 
 document.querySelector('button').addEventListener('click', () => {
@@ -415,12 +419,14 @@ errorButton.addEventListener('click', () => {
   resetTurn()
 })
 
+// This function is only used in one place, but it fixed a very annoying bug
 const addIdsToMainFour = () => {
   for (let i = 1; i < 5; i++) {
     mainFourHTML[i - 1].setAttribute('id', i.toString())
   }
 }
 
+// Second click... BEAST of a function
 const placeCard = (stack) => {
   // Get card to where it is going
   console.log(stack)
