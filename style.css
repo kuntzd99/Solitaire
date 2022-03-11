@@ -1,6 +1,7 @@
 body {
   background-color: rgb(252, 216, 171);
   font-family: 'Itim', cursive;
+  text-align: justify;
 }
 
 footer {
@@ -46,7 +47,6 @@ a {
   max-height: 50px;
   min-height: 50px;
   font-size: 25px;
-  vertical-align: text-top;
   border-radius: 10%;
 }
 
@@ -114,7 +114,7 @@ ul {
     #43e 100% */
   border-style: solid;
   border-color: gray;
-  background-image: linear-gradient(to bottom right, brown);
+  background-image: linear-gradient(to bottom right, brown, cyan);
 }
 
 .empty {
@@ -122,7 +122,8 @@ ul {
   border-radius: 10%;
   width: 60px;
   margin: 20px 10px;
-  min-width: 60px;
+  min-width: 85px;
+  max-height: 150px;
 }
 
 #info {

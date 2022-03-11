@@ -69,8 +69,6 @@ const resize = (htmlStack) => {
 }
 
 const clearGame = () => {
-  deckHTML.classList.remove('empty')
-  drawnHTML.classList.remove('empty')
   for (let i = 0; i < 7; i++) {
     mainSevenHTML[i].classList.remove('empty')
     while (mainSevenHTML[i].firstChild) {
@@ -83,8 +81,8 @@ const clearGame = () => {
     mainFourHTML[i].style.backgroundColor = ''
   }
   drawnHTML.innerText = ''
-  drawnHTML.color = 'black'
-  drawnHTML.backgroundColor = ''
+  drawnHTML.style.color = 'black'
+  drawnHTML.style.backgroundColor = ''
   deckHTML.classList.remove('facedown')
   mainSeven = [[], [], [], [], [], [], []]
   mainFour = [[], [], [], []]
@@ -127,7 +125,6 @@ const resetDeck = () => {
   deck = drawn.reverse()
   drawn = []
   if (deck.length === 0) {
-    deckHTML.classList.add('empty')
     deckEmpty = true
   }
 }
@@ -166,14 +163,14 @@ deckHTML.addEventListener('click', () => {
   }
 })
 
-while (deckEmpty === false) {
-  deckHTML.addEventListener('mouseenter', () => {
+deckHTML.addEventListener('mouseenter', () => {
+  if (deckEmpty === false) {
     deckHTML.style.borderColor = 'yellow'
-  })
-  deckHTML.addEventListener('mouseleave', () => {
-    deckHTML.style.borderColor = 'gray'
-  })
-}
+  }
+})
+deckHTML.addEventListener('mouseleave', () => {
+  deckHTML.style.borderColor = 'gray'
+})
 
 const getAvailableHTMLCards = () => {
   let cards = []
@@ -283,7 +280,6 @@ const addCardFromDrawnToMainFour = (stack) => {
   if (drawn.length !== 0) {
     showCard(drawnHTML, drawn[drawn.length - 1])
   } else {
-    drawnHTML.classList.add('empty')
     drawnHTML.innerHTML = ''
     drawnHTML.style.color = 'black'
     drawnHTML.style.backgroundColor = ''
@@ -421,7 +417,7 @@ document.querySelector('button').addEventListener('click', () => {
   if (playedGame === false) {
     document.querySelector('header').remove()
   }
-  playedGame = false
+  playedGame = true
   document.querySelector('button').innerText = 'New Game'
   errorButton.innerText = 'Cancel Move'
   document.querySelector('#other').appendChild(errorButton)
