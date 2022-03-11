@@ -1,4 +1,4 @@
-const PEEK_SIZE = '90px'
+const PEEK_SIZE = '100px'
 
 class Card {
   constructor(symbol, suit) {
@@ -67,6 +67,25 @@ const resize = (htmlStack) => {
   return htmlStack
 }
 
+const clearGame = () => {
+  deckHTML.classList.remove('empty')
+  drawnHTML.classList.remove('empty')
+  stacks.forEach((stack) => {
+    stack.classList.remove('empty')
+    for (let i = 0; i < stack.children.length; i++) {
+      stack.removeChild(stack.firstChild)
+    }
+  })
+  mainFour.forEach((array) => {
+    array = []
+  })
+  mainSeven.forEach((array) => {
+    array = []
+  })
+  deck = []
+  drawn = []
+}
+
 const setUpGame = () => {
   mainSeven.forEach((array, index) => {
     for (let i = 0; i < index + 1; i++) {
@@ -98,6 +117,9 @@ const resetDeck = () => {
   drawnHTML.style.backgroundColor = ''
   deck = drawn.reverse()
   drawn = []
+  if (deck.length === 0) {
+    deckHTML.classList.add('empty')
+  }
 }
 
 const draw = () => {
@@ -242,6 +264,9 @@ const addCardFromDrawnToMainFour = (stack) => {
     (parseInt(stack.id) - 1).toString()
   )
   drawnHTML.setAttribute('id', 'drawn')
+  if (drawn.length === 0) {
+    drawnHTML.classList.add('empty')
+  }
 }
 
 const addCardFromMainSevenToMainFour = (stack) => {
@@ -275,8 +300,24 @@ const checkWin = () => {
     total += mainFour[i].length
   }
   if (total === 52) {
-    console.log('win')
+    infoParagraph.innerText = 'You Win!!!'
   }
+}
+
+// Fisher-Yates shuffle algorithm taken from internet (Stack Overflow)
+const shuffle = (array) => {
+  let currentIndex = array.length,
+    randomIndex
+
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex)
+    currentIndex--
+    ;[array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex]
+    ]
+  }
+  return array
 }
 
 let movableCardsHTML = getAvailableHTMLCards()
@@ -341,13 +382,24 @@ function myListenerStack(stack) {
   }
 }
 
+const errorButton = document.createElement('button')
+
 document.querySelector('button').addEventListener('click', () => {
+  clearGame()
   fillDeck()
+  shuffle(deck)
   setUpGame()
+  document.querySelector('button').innerText = 'New Game'
+  errorButton.innerText = 'Click to cancel move'
+  document.querySelector('#other').appendChild(errorButton)
   movableCardsHTML = getAvailableHTMLCards()
   movableCardsHTML.forEach((card) => {
     card.addEventListener('click', myListenerCard)
   })
+})
+
+errorButton.addEventListener('click', () => {
+  resetTurn()
 })
 
 const addIdsToMainFour = () => {

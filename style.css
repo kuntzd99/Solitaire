@@ -70,9 +70,9 @@ ul {
   background-image: linear-gradient(
     to bottom right,
     #262626,
-    red,
+    rgb(10, 198, 10),
     #eaeaea,
-    violet,
+    rgb(126, 7, 126),
     #262626
   );
 }
@@ -82,10 +82,30 @@ ul {
   border-radius: 10%;
   width: 40px;
   margin: 20px 10px;
+  min-width: 40px;
 }
 
 #info {
   text-align: center;
   margin-top: 30px;
   font-size: 30px;
+  font-family: 'Itim', cursive;
+}
+
+button {
+  background-color: white;
+  font-size: 20px;
+  border-radius: 20%;
+  font-family: 'Itim', cursive;
+  border-color: rgb(77, 255, 0);
+  border-width: 5px;
+  margin-top: 50px;
+  padding: 25px 50px;
+}
+
+#other {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
