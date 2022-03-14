@@ -61,18 +61,6 @@ const showCard = (div, card) => {
   div.classList.remove('facedown')
 }
 
-// const getNumFaceDown = (stack) => {
-//   total = 0
-//   for (let i = 0; i < stack.children.length; i++) {
-//     for (let j = 0; j < stack.children[i].classList.length; j++) {
-//       if (stack.children[i].classList[j] === 'facedown') {
-//         total++
-//       }
-//     }
-//   }
-//   return total
-// }
-
 const resize = (htmlStack) => {
   if (htmlStack.children.length >= 1) {
     //numFaceDown = getNumFaceDown(htmlStack)
@@ -551,8 +539,6 @@ const placeCard = (stack) => {
             if (mainSeven[getStack(cardHTML)].length === 0) {
               mainSevenHTML[getStack(cardHTML)].classList.add('empty')
               mainSevenHTML[getStack(cardHTML)].style.borderStyle = 'solid'
-              // mainSevenHTML[getStack(cardHTML)].style.color = 'black'
-              // mainSevenHTML[getStack(cardHTML)].style.innerText = ''
             } else {
               showCard(
                 mainSevenHTML[getStack(cardHTML)].lastChild,
