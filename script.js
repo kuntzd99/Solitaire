@@ -1,4 +1,5 @@
 const PEEK_SIZE = '100px'
+const FACEDOWN_SIZE = '20px'
 
 class Card {
   constructor(symbol, suit) {
@@ -60,9 +61,23 @@ const showCard = (div, card) => {
   div.classList.remove('facedown')
 }
 
+// const getNumFaceDown = (stack) => {
+//   total = 0
+//   for (let i = 0; i < stack.children.length; i++) {
+//     for (let j = 0; j < stack.children[i].classList.length; j++) {
+//       if (stack.children[i].classList[j] === 'facedown') {
+//         total++
+//       }
+//     }
+//   }
+//   return total
+// }
+
 const resize = (htmlStack) => {
   if (htmlStack.children.length >= 1) {
+    //numFaceDown = getNumFaceDown(htmlStack)
     htmlStack.style.gridTemplateRows =
+      /*(FACEDOWN_SIZE + ' ').repeat(numFaceDown) +*/
       (PEEK_SIZE + ' ').repeat(htmlStack.children.length - 1) + '1fr'
   }
   return htmlStack
@@ -421,6 +436,7 @@ const errorButton = document.createElement('button')
 playedGame = false
 document.querySelector('button').addEventListener('click', () => {
   deckEmpty = false
+  infoParagraph.innerText = ''
   clearGame()
   fillDeck()
   shuffle(deck)
